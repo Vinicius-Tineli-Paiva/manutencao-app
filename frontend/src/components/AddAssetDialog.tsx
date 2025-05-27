@@ -1,16 +1,12 @@
 import React, { useState } from 'react';
 import { Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, Alert, CircularProgress } from '@mui/material';
-import api from '../api/api'; // Certifique-se de que o caminho está correto
+import { api } from '../api/api'; // Certifique-se de que o caminho está correto
 import { AxiosError } from 'axios';
+import type { Asset } from '../types';
 
-// Definindo o tipo Asset (deve ser o mesmo que no seu backend/modelos e DashboardPage)
-interface Asset {
-  id: string;
-  user_id: string;
-  name: string;
-  description: string;
-  created_at: string;
-  updated_at: string;
+interface AddAssetResponse {
+  message: string;
+  asset: Asset; // O backend retorna o ativo criado dentro de 'asset'
 }
 
 // Definindo as props que o AddAssetDialog receberá
@@ -19,6 +15,7 @@ interface AddAssetDialogProps {
   onClose: () => void; // Função para fechar o modal
   onAssetAdded: (newAsset: Asset) => void; // Função para notificar o pai de um novo ativo
 }
+
 
 function AddAssetDialog({ open, onClose, onAssetAdded }: AddAssetDialogProps) {
   const [name, setName] = useState('');

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Typography, Button, TextField, Paper, Tabs, Tab } from '@mui/material';
-import api from '../api/api'; // Importe a instância do Axios
+import { api } from '../api/api'; 
 import { AxiosError } from 'axios';
 
 interface AuthResponse {

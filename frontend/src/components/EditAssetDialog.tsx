@@ -1,15 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Button,
-  TextField,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Alert,
-  CircularProgress,
-} from '@mui/material';
-import api from '../api/api';
+import { Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, Alert, CircularProgress } from '@mui/material';
+import { api } from '../api/api';
 import { AxiosError } from 'axios';
 
 // Definindo o tipo Asset (deve ser o mesmo que no seu backend/modelos)

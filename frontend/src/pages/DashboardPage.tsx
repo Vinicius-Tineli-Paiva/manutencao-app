@@ -2,23 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Box, Typography, Button, CircularProgress, Alert, IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import api from '../api/api'; // Importe a instância do Axios
+import { api } from '../api/api';
 import { AxiosError } from 'axios';
 import AddAssetDialog from '../components/AddAssetDialog';
 import EditAssetDialog from '../components/EditAssetDialog';
-
-// Definindo o tipo Asset (deve ser o mesmo que no seu backend/modelos)
-interface Asset {
-  id: string; // Ou number, dependendo do tipo no seu DB
-  user_id: string;
-  name: string;
-  description: string;
-  created_at: string;
-  updated_at: string;
-}
-
+import UpcomingMaintenances from '../components/maintenances/upcomingMaintenances'
+import type { Asset } from '../types';
 interface DashboardPageProps {
-  onLogout: () => void; // Função que o componente pai (App.tsx) passará
+  onLogout: () => void; 
 }
 
 function DashboardPage({ onLogout }: DashboardPageProps) {
@@ -49,9 +40,7 @@ function DashboardPage({ onLogout }: DashboardPageProps) {
   // useEffect para carregar os ativos quando o componente montar
   useEffect(() => {
     fetchAssets();
-    // Adicione 'fetchAssets' aqui se o seu linter reclamar.
-    // Embora a função seja estável, alguns linters podem pedir.
-  }, [ /* Não precisa de onLogout aqui, pois a busca é para carregar inicial */ ]);
+  }, []);
 
   // Função para abrir o modal de adicionar ativo
   const handleOpenAddAssetDialog = () => {
@@ -115,10 +104,10 @@ function DashboardPage({ onLogout }: DashboardPageProps) {
   };
 
   return (
-   <Box sx={{ p: 4 }}>
+     <Box sx={{ p: 4 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
         <Typography variant="h4" component="h1">
-          My Assets
+          Meus Ativos
         </Typography>
         <Box>
           <Button
@@ -127,13 +116,16 @@ function DashboardPage({ onLogout }: DashboardPageProps) {
             onClick={handleOpenAddAssetDialog}
             sx={{ mr: 2 }}
           >
-            Add Asset
+            Adicionar Ativo
           </Button>
           <Button variant="outlined" color="secondary" onClick={handleLogout}>
-            Logout
+            Sair
           </Button>
         </Box>
       </Box>
+
+      {/* NOVO: Componente para exibir manutenções próximas/vencidas */}
+      <UpcomingMaintenances />
 
       {loading && (
         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
