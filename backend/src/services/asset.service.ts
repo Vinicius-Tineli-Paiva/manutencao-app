@@ -84,7 +84,13 @@ export const updateAsset = async (asset_id: string, user_id: string, updates: Pa
   values.push(asset_id);
   values.push(user_id);
 
-  const text = `UPDATE assets SET ${setClauses.join(', ')} WHERE id = $${paramIndex++} AND user_id = $${paramIndex++} RETURNING id, user_id, name, description, created_at, updated_at`;
+  const text = `
+    UPDATE assets
+    SET ${setClauses.join(', ')}
+    WHERE id = $${paramIndex++} AND user_id = $${paramIndex++}
+    RETURNING id, user_id, name, description, created_at, updated_at
+  `;
+
   try {
     const result = await query(text, values);
     return result.rows[0] || null;

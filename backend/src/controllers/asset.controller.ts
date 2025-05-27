@@ -91,7 +91,7 @@ export const updateExistingAsset = async (req: Request, res: Response) => {
     if (!updatedAsset) {
       return res.status(404).json({ message: 'Asset not found or you do not have permission to update it.' });
     }
-    res.status(200).json({ message: 'Asset updated successfully.', asset: updatedAsset });
+    res.status(200).json(updatedAsset);
   } catch (error) {
     console.error('Error in updateExistingAsset:', error);
     res.status(500).json({ message: 'Failed to update asset.' });

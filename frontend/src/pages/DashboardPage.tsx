@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, Button, CircularProgress, Alert, IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 import api from '../api/api'; // Importe a instância do Axios
 import { AxiosError } from 'axios';
 import AddAssetDialog from '../components/AddAssetDialog';
+import EditAssetDialog from '../components/EditAssetDialog';
 
 // Definindo o tipo Asset (deve ser o mesmo que no seu backend/modelos)
 interface Asset {
@@ -24,6 +26,8 @@ function DashboardPage({ onLogout }: DashboardPageProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [openAddAssetDialog, setOpenAddAssetDialog] = useState(false);
+  const [openEditAssetDialog, setOpenEditAssetDialog] = useState(false);
+  const [assetToEdit, setAssetToEdit] = useState<Asset | null>(null);
 
     // Função para buscar os ativos (extraída para ser chamada facilmente)
   const fetchAssets = async () => {
@@ -65,6 +69,26 @@ function DashboardPage({ onLogout }: DashboardPageProps) {
     handleCloseAddAssetDialog(); // Fecha o modal após adicionar
   };
 
+  // Função para abrir o modal de edição
+  const handleOpenEditAssetDialog = (asset: Asset) => {
+    setAssetToEdit(asset); // Define qual ativo será editado
+    setOpenEditAssetDialog(true);
+  };
+
+  // Função para fechar o modal de edição
+  const handleCloseEditAssetDialog = () => {
+    setOpenEditAssetDialog(false);
+    setAssetToEdit(null); 
+  };
+
+  // Função chamada pelo EditAssetDialog quando um ativo é atualizado com sucesso
+  const handleAssetUpdated = (updatedAsset: Asset) => {
+    setAssets((prevAssets) =>
+      prevAssets.map((asset) => (asset.id === updatedAsset.id ? updatedAsset : asset))
+    );
+    handleCloseEditAssetDialog(); // Fecha o modal após a atualização
+  };
+
   const handleDeleteAsset = async (assetId: string) => {
     if (!window.confirm('Tem certeza que deseja excluir este ativo?')) {
       return; // O usuário cancelou
@@ -91,7 +115,7 @@ function DashboardPage({ onLogout }: DashboardPageProps) {
   };
 
   return (
- <Box sx={{ p: 4 }}>
+   <Box sx={{ p: 4 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
         <Typography variant="h4" component="h1">
           My Assets
@@ -103,10 +127,10 @@ function DashboardPage({ onLogout }: DashboardPageProps) {
             onClick={handleOpenAddAssetDialog}
             sx={{ mr: 2 }}
           >
-            Adicionar Ativo
+            Add Asset
           </Button>
           <Button variant="outlined" color="secondary" onClick={handleLogout}>
-            Sair
+            Logout
           </Button>
         </Box>
       </Box>
@@ -114,7 +138,7 @@ function DashboardPage({ onLogout }: DashboardPageProps) {
       {loading && (
         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
           <CircularProgress />
-          <Typography variant="body1" sx={{ ml: 2 }}>Carregando ativos...</Typography>
+          <Typography variant="body1" sx={{ ml: 2 }}>Loading assets...</Typography>
         </Box>
       )}
 
@@ -126,36 +150,53 @@ function DashboardPage({ onLogout }: DashboardPageProps) {
 
       {!loading && !error && assets.length === 0 && (
         <Alert severity="info" sx={{ mt: 2 }}>
-          Você ainda não possui nenhum ativo.
+          You don't have any assets registered yet.
         </Alert>
       )}
 
       {!loading && !error && assets.length > 0 && (
         <Box sx={{ mt: 3 }}>
-          <Typography variant="h6">Lista de Ativos:</Typography>
+          <Typography variant="h6">Asset List:</Typography>
           <ul>
             {assets.map((asset) => (
               <li key={asset.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <Typography variant="body1">
                   **{asset.name}** - {asset.description || 'No description'}
                 </Typography>
-                <IconButton
-                  aria-label="delete"
-                  color="error" // Cor vermelha para o ícone de exclusão
-                  onClick={() => handleDeleteAsset(asset.id)} // Passa o ID do ativo para a função
-                >
-                  <DeleteIcon />
-                </IconButton>
+                <Box> {/* Agrupa os botões de Editar e Excluir */}
+                  <IconButton
+                    aria-label="edit"
+                    color="info" // Cor azul para o ícone de edição
+                    onClick={() => handleOpenEditAssetDialog(asset)} // Abre o modal de edição
+                    sx={{ mr: 1 }} // Margem à direita para separar
+                  >
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton
+                    aria-label="delete"
+                    color="error"
+                    onClick={() => handleDeleteAsset(asset.id)}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </Box>
               </li>
             ))}
           </ul>
         </Box>
       )}
 
+      {/* Renderização dos componentes de modal */}
       <AddAssetDialog
         open={openAddAssetDialog}
         onClose={handleCloseAddAssetDialog}
         onAssetAdded={handleAssetAdded}
+      />
+      <EditAssetDialog
+        open={openEditAssetDialog}
+        onClose={handleCloseEditAssetDialog}
+        assetToEdit={assetToEdit} // Passa o ativo que está sendo editado
+        onAssetUpdated={handleAssetUpdated} // Função para lidar com a atualização
       />
     </Box>
   );
