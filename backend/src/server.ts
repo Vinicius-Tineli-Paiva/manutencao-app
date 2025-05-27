@@ -3,11 +3,18 @@ import dotenv from 'dotenv';
 import { connectDb } from './config/db';
 import authRoutes from './routes/auth.routes';
 import assetRoutes from './routes/asset.routes';
+import cors from 'cors';
 
 dotenv.config(); // Load environment variables
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+app.use(cors({
+  origin: 'http://localhost:5173', // O frontend vai rodar nesta porta
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos HTTP permitidos
+  allowedHeaders: ['Content-Type', 'Authorization'], // Cabeçalhos permitidos
+}));
 
 app.use(express.json());
 
