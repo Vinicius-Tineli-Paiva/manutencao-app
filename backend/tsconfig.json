@@ -1,15 +1,16 @@
 {
   "compilerOptions": {
-    "target": "es2022",                  /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
-    "module": "commonjs",                /* Specify what module code is generated. */
-    "rootDir": "./src",                  /* Specify the root folder within your source files. */
-    "outDir": "./dist",                  /* Specify an output folder for all emitted files. */
-    "esModuleInterop": true,             /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */
-    "forceConsistentCasingInFileNames": true, /* Ensure that casing is consistent in imports. */
-    "strict": true,                      /* Enable all strict type-checking options. */
-    "skipLibCheck": true,                /* Skip type checking all .d.ts files. */
-    "sourceMap": true                    /* Create source map files for debugging. */
+    "target": "es2020",                            /* Define a versão do ECMAScript de saída (ex: ES2020 é bom para Node.js moderno). */
+    "module": "commonjs",                         /* Define o sistema de módulos (CommonJS é o padrão para Node.js). */
+    "outDir": "./dist",                           /* Define o diretório onde os arquivos JavaScript compilados serão salvos. */
+    "rootDir": "./src",                           /* Define o diretório raiz dos seus arquivos TypeScript. */
+    "esModuleInterop": true,                      /* Permite importações padrão para módulos CommonJS (essencial para 'express'). */
+    "forceConsistentCasingInFileNames": true,     /* Garante que o uso de maiúsculas/minúsculas nos nomes dos arquivos seja consistente. */
+    "strict": true,                               /* Ativa todas as opções de verificação de tipo estritas (altamente recomendado). */
+    "skipLibCheck": true,                         /* Pula a verificação de tipo de arquivos .d.ts das bibliotecas (melhora a velocidade de compilação). */
+    "noImplicitAny": true,                        /* Dispara erro se o TypeScript não conseguir inferir um tipo e assume 'any'. */
+    "resolveJsonModule": true                     /* Permite importar arquivos JSON diretamente. */
   },
-  "include": ["src/**/*.ts"],            /* Specify a list of files to include in the program. */
-  "exclude": ["node_modules"]            /* Specify a list of file specs to exclude from the program. */
+  "include": ["src/**/*.ts"],                     /* Inclui todos os arquivos TypeScript dentro da pasta 'src'. */
+  "exclude": ["node_modules"]                     /* Exclui a pasta 'node_modules' da compilação. */
 }
