@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import { connectDb } from './config/db';
 import authRoutes from './routes/auth.routes';
 import assetRoutes from './routes/asset.routes';
+import maintenanceRoutes from './routes/maintenance.routes';
 import cors from 'cors';
 
 dotenv.config(); // Load environment variables
@@ -10,12 +11,7 @@ dotenv.config(); // Load environment variables
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors({
-  origin: 'http://localhost:5173', // O frontend vai rodar nesta porta
-  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos HTTP permitidos
-  allowedHeaders: ['Content-Type', 'Authorization'], // Cabeçalhos permitidos
-}));
-
+app.use(cors());
 app.use(express.json());
 
 /**
@@ -31,6 +27,8 @@ app.use('/api/auth', authRoutes); // All auth routes will be prefixed with /api/
 // Use asset routes
 app.use('/api/assets', assetRoutes); // All asset routes will be prefixed with /api/assets and require authentication
 
+app.use('/api/maintenances', maintenanceRoutes);
+
 /**
  * @description Starts the Express server and connects to the database.
  */
@@ -42,6 +40,7 @@ const startServer = async () => {
     console.log(`Access it at http://localhost:${PORT}`);
     console.log(`Auth routes are available at http://localhost:${PORT}/api/auth`);
     console.log(`Asset routes are available at http://localhost:${PORT}/api/assets`);
+    console.log(`Maintenance routes are available at http://localhost:${PORT}/api/maintenances`);
   });
 };
 
