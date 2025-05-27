@@ -1,10 +1,13 @@
--- Drop tables if they exist (para facilitar o desenvolvimento e recriação)
-DROP TABLE IF EXISTS users CASCADE;
+-- Drop tables if they exist (for development/re-initialization)
+DROP TABLE IF EXISTS maintenances CASCADE;
+DROP TABLE IF EXISTS maintenance_schedules CASCADE;
 DROP TABLE IF EXISTS assets CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
 
--- Tabela de Usuários
+
+-- Create the users table
 CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     username VARCHAR(50) UNIQUE NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
@@ -12,42 +15,36 @@ CREATE TABLE users (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- Tabela de Ativos
-CREATE TABLE assets (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    description TEXT,
-    serial_number VARCHAR(100) UNIQUE,
-    acquisition_date DATE,
-    warranty_end_date DATE,
-    status VARCHAR(50) DEFAULT 'operational', -- operational, in_maintenance, retired, etc.
-    location VARCHAR(100),
-    assigned_to VARCHAR(100), -- Pode ser o nome de um usuário ou setor
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
-
--- Índices para otimização de busca
+-- Index for faster lookups on username and email
 CREATE INDEX idx_users_username ON users (username);
 CREATE INDEX idx_users_email ON users (email);
-CREATE INDEX idx_assets_name ON assets (name);
-CREATE INDEX idx_assets_serial_number ON assets (serial_number);
 
--- Gatilho para atualizar a coluna 'updated_at' automaticamente
-CREATE OR REPLACE FUNCTION update_timestamp()
-RETURNS TRIGGER AS $$
-BEGIN
-    NEW.updated_at = NOW();
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER update_users_timestamp
+-- Trigger to call the update_updated_at_column function on update of users table
+CREATE TRIGGER update_users_updated_at
 BEFORE UPDATE ON users
 FOR EACH ROW
-EXECUTE FUNCTION update_timestamp();
+EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_assets_timestamp
+
+-- Create the assets table
+CREATE TABLE assets (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_user
+        FOREIGN KEY(user_id)
+        REFERENCES users(id)
+        ON DELETE CASCADE
+);
+
+-- Index for faster lookups on user_id
+CREATE INDEX idx_assets_user_id ON assets (user_id);
+
+-- Trigger for assets table (reusing the same function)
+CREATE TRIGGER update_assets_updated_at
 BEFORE UPDATE ON assets
 FOR EACH ROW
-EXECUTE FUNCTION update_timestamp();
+EXECUTE FUNCTION update_updated_at_column();
