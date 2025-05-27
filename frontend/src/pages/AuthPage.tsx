@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
 import { Box, Typography, Button, TextField, Paper, Tabs, Tab } from '@mui/material';
 import api from '../api/api'; // Importe a instância do Axios
+import { AxiosError } from 'axios';
 
 interface AuthResponse {
   token: string;
   message?: string; // Para a resposta de registro, se houver
 }
+interface AuthPageProps {
+  onLoginSuccess: () => void; 
+}
 
-function AuthPage() {
+function AuthPage({ onLoginSuccess }: AuthPageProps) {
   const [tabValue, setTabValue] = useState(0);
   const [username, setUsername] = useState(''); // Usado apenas para registro
   const [email, setEmail] = useState('');     // Usado para login e registro
@@ -39,6 +43,7 @@ function AuthPage() {
         setUsername(''); // Limpa campos após login
         setEmail('');
         setPassword('');
+        onLoginSuccess();
       } else { // Registro
         const response = await api.post<AuthResponse>('/auth/register', { username, email, password });
         setMessage('Registro bem-sucedido! Faça login agora.');
