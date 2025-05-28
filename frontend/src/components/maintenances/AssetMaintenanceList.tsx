@@ -4,7 +4,6 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import type { Maintenance } from '../../types';
 import { api } from '../../api/api';
-import { AxiosError } from 'axios';
 import { useParams } from 'react-router-dom'; // NOVO: Importe useParams para pegar o asset_id
 
 interface AssetMaintenanceListProps {
@@ -37,10 +36,18 @@ function AssetMaintenanceList({
       await api.delete(`/maintenances/asset/${assetId}/${maintenanceId}`);
       onMaintenanceDeleted(); // Notifica o pai para re-buscar as manutenções
       alert('Manutenção excluída com sucesso!');
-    } catch (err) {
-      const axiosError = err as AxiosError;
-      console.error('Erro ao excluir manutenção:', axiosError.response?.data || axiosError.message);
-      alert((axiosError.response?.data as { message?: string })?.message || 'Falha ao excluir manutenção.');
+    } catch (err: unknown) {
+      if (typeof err === 'object' && err !== null && 'response' in err && (err as any).response.data) {
+        const errorMessage = (err as any).response.data.message || 'Falha ao excluir manutenção.';
+        console.error('Erro ao excluir manutenção:', errorMessage, err);
+        alert(errorMessage);
+      } else if (err instanceof Error) {
+        console.error('Um erro inesperado ocorreu:', err.message);
+        alert(err.message || 'Um erro inesperado ocorreu ao excluir manutenção.');
+      } else {
+        console.error('Um erro completamente inesperado ocorreu:', err);
+        alert('Um erro inesperado ocorreu ao excluir manutenção.');
+      }
     }
   };
 

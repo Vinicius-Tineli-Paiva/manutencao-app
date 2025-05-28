@@ -9,6 +9,7 @@ import type { Asset, Maintenance } from '../types';
 import EditAssetDialog from '../components/EditAssetDialog';
 import AddMaintenanceDialog from '../components/AddMaintenanceDialog';
 import AssetMaintenanceList from '../components/maintenances/AssetMaintenanceList';
+import EditMaintenanceDialog from '../components/maintenances/EditMaintenanceDialog';
 
 function AssetDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -23,6 +24,8 @@ function AssetDetailPage() {
 
   const [openEditAssetDialog, setOpenEditAssetDialog] = useState(false);
   const [openAddMaintenanceDialog, setOpenAddMaintenanceDialog] = useState(false);
+  const [openEditMaintenanceDialog, setOpenEditMaintenanceDialog] = useState(false);
+  const [maintenanceToEdit, setMaintenanceToEdit] = useState<Maintenance | null>(null);
 
   const [maintenancesRefreshKey, setMaintenancesRefreshKey] = useState(0);
 
@@ -110,9 +113,23 @@ function AssetDetailPage() {
   };
 
   const handleEditMaintenance = (maintenance: Maintenance) => {
-    alert(`Funcionalidade de Editar Manutenção para: ${maintenance.service_description} (ID: ${maintenance.id}) será implementada em breve!`);
+    setMaintenanceToEdit(maintenance);
+    setOpenEditMaintenanceDialog(true);
   };
 
+    const handleCloseEditMaintenanceDialog = () => { 
+    setOpenEditMaintenanceDialog(false);
+    setMaintenanceToEdit(null); 
+  };
+
+   const handleMaintenanceUpdated = (updatedMaintenance: Maintenance) => {
+       // Atualiza a lista localmente para refletir a mudança imediatamente
+    setMaintenances((prevMaintenances) =>
+      prevMaintenances.map((m) => (m.id === updatedMaintenance.id ? updatedMaintenance : m))
+    );
+    handleCloseEditMaintenanceDialog();
+    setMaintenancesRefreshKey(prevKey => prevKey + 1); 
+  };
   if (loadingAsset) {
     return (
       <Container sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
@@ -217,6 +234,17 @@ function AssetDetailPage() {
           initialAssetId={asset.id}
         />
       )}
+      
+        {/* Renderização do EditMaintenanceDialog */}
+      {maintenanceToEdit && (
+        <EditMaintenanceDialog
+          open={openEditMaintenanceDialog}
+          onClose={handleCloseEditMaintenanceDialog}
+          maintenanceToEdit={maintenanceToEdit}
+          onMaintenanceUpdated={handleMaintenanceUpdated}
+        />
+      )}
+
     </Container>
   );
 }
