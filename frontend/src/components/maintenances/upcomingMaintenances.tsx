@@ -3,35 +3,37 @@ import { getUpcomingMaintenances } from '../../api/maintenanceApi';
 import type { Maintenance } from '../../types'; 
 import { Typography, CircularProgress, List, ListItem, ListItemText, Paper, Box, Alert } from '@mui/material';
 
-const UpcomingMaintenances: React.FC = () => {
+interface UpcomingMaintenancesProps {
+  refreshKey: number; // Uma chave numérica que será incrementada para forçar o refresh
+}
+
+const UpcomingMaintenances: React.FC<UpcomingMaintenancesProps> = ({ refreshKey }) => {
   const [maintenances, setMaintenances] = useState<Maintenance[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchMaintenances = async () => {
-      setLoading(true);
-      setError(null); // Limpa erros anteriores
-      try {
-        const data = await getUpcomingMaintenances();
-        // Ordenar por data de vencimento (next_due_date) - mais próximas primeiro
-        const sortedMaintenances = data.sort((a, b) => {
-          // Lidar com datas nulas/indefinidas para next_due_date
-          const dateA = a.next_due_date ? new Date(a.next_due_date).getTime() : Infinity;
-          const dateB = b.next_due_date ? new Date(b.next_due_date).getTime() : Infinity;
-          return dateA - dateB;
-        });
-        setMaintenances(sortedMaintenances);
-      } catch (err: any) {
-        console.error("Failed to fetch upcoming maintenances:", err);
-        setError(err.response?.data?.message || err.message || 'Erro ao buscar manutenções.');
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchMaintenances = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await getUpcomingMaintenances();
+      const sortedMaintenances = data.sort((a, b) => {
+        const dateA = a.next_due_date ? new Date(a.next_due_date).getTime() : Infinity;
+        const dateB = b.next_due_date ? new Date(b.next_due_date).getTime() : Infinity;
+        return dateA - dateB;
+      });
+      setMaintenances(sortedMaintenances);
+    } catch (err: any) {
+      console.error("Failed to fetch upcoming maintenances:", err);
+      setError(err.response?.data?.message || err.message || 'Erro ao buscar manutenções.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchMaintenances();
-  }, []);
+  }, [refreshKey]);
 
   if (loading) {
     return (
@@ -93,7 +95,7 @@ const UpcomingMaintenances: React.FC = () => {
                         "Vencimento: Não definido"
                       )}
                       <br />
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography variant="body2" color="text.secondary" component="span">
                         Descrição do ativo: {maintenance.asset_description}
                       </Typography>
                     </>

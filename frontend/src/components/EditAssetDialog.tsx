@@ -1,109 +1,106 @@
 import React, { useState, useEffect } from 'react';
-import { Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, Alert, CircularProgress } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, CircularProgress, Alert } from '@mui/material';
 import { api } from '../api/api';
 import { AxiosError } from 'axios';
+import type { Asset } from '../types';
 
-// Definindo o tipo Asset (deve ser o mesmo que no seu backend/modelos)
-interface Asset {
-  id: string;
-  user_id: string; // Embora não usemos diretamente, é bom manter para consistência
-  name: string;
-  description: string;
-  created_at: string;
-  updated_at: string;
-}
-
-// Definindo as props que o EditAssetDialog receberá
 interface EditAssetDialogProps {
-  open: boolean; // Controla se o modal está aberto
-  onClose: () => void; // Função para fechar o modal
-  assetToEdit: Asset | null; // O ativo a ser editado (pode ser null se o modal não estiver aberto)
-  onAssetUpdated: (updatedAsset: Asset) => void; // Função para notificar o pai do ativo atualizado
+  open: boolean;
+  onClose: () => void;
+  assetToEdit: Asset | null; 
+  onAssetUpdated: (updatedAsset: Asset) => void;
+  onAssetAdded?: (newAsset: Asset) => void; 
 }
 
-function EditAssetDialog({ open, onClose, assetToEdit, onAssetUpdated }: EditAssetDialogProps) {
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
+function EditAssetDialog({ open, onClose, assetToEdit, onAssetUpdated, onAssetAdded }: EditAssetDialogProps) {
+  // Inicializa os estados com os valores de assetToEdit se ele existir, senão vazio
+  const [name, setName] = useState(assetToEdit?.name || '');
+  const [description, setDescription] = useState(assetToEdit?.description || '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // UseEffect para preencher o formulário quando um 'assetToEdit' é passado
+  // Atualizar os estados dos campos quando o 'assetToEdit' mudar (ou seja, quando o modal é aberto para um novo ativo)
   useEffect(() => {
-    if (open && assetToEdit) {
-      setName(assetToEdit.name);
-      setDescription(assetToEdit.description || ''); // Garante que a descrição não seja 'null'
-      setError(null); // Limpa erros anteriores
+    if (open) { 
+      setName(assetToEdit?.name || '');
+      setDescription(assetToEdit?.description || '');
+      setError(null); 
     }
-  }, [open, assetToEdit]); // Reage a mudanças em 'open' ou 'assetToEdit'
+  }, [open, assetToEdit]); 
 
-  const handleUpdateAsset = async () => {
-    if (!name.trim()) {
-      setError('Asset name cannot be empty.');
-      return;
-    }
-
-    if (!assetToEdit) { // Garante que há um ativo para editar
-        setError('No asset selected for editing.');
-        return;
-    }
-
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
     setLoading(true);
     setError(null);
 
-    try {
-      // Faz a requisição PUT para atualizar o ativo
-      // O backend deve retornar o ativo atualizado
-      const response = await api.put<Asset>(`/assets/${assetToEdit.id}`, {
-        name,
-        description,
-      });
+    if (!name.trim()) {
+      setError('O nome do ativo é obrigatório.');
+      setLoading(false);
+      return;
+    }
 
-      onAssetUpdated(response.data); // Notifica o componente pai com o ativo atualizado
-      onClose(); // Fecha o modal
+    try {
+      if (assetToEdit) {
+        const response = await api.put<Asset>(`/assets/${assetToEdit.id}`, {
+          name: name,
+          description: description,
+        });
+        onAssetUpdated(response.data);
+      } else {
+        const response = await api.post<Asset>('/assets', {
+          name: name,
+          description: description,
+        });
+        if (onAssetAdded) {
+          onAssetAdded(response.data); 
+        }
+      }
+      onClose(); 
     } catch (err) {
       const axiosError = err as AxiosError;
-      console.error('Error updating asset:', axiosError.response?.data || axiosError.message);
-      setError((axiosError.response?.data as { message?: string })?.message || 'Failed to update asset.');
+      console.error('Error updating/adding asset:', axiosError.response?.data || axiosError.message);
+      setError((axiosError.response?.data as { message?: string })?.message || 'Falha ao salvar o ativo.');
     } finally {
       setLoading(false);
     }
   };
 
+  const dialogTitle = assetToEdit ? 'Editar Ativo' : 'Adicionar Novo Ativo';
+  const submitButtonText = assetToEdit ? 'Salvar Alterações' : 'Adicionar Ativo';
+
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Edit Asset</DialogTitle>
-      <DialogContent>
-        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-        <TextField
-          autoFocus
-          margin="dense"
-          label="Asset Name"
-          type="text"
-          fullWidth
-          variant="outlined"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-          sx={{ mb: 2 }}
-        />
-        <TextField
-          margin="dense"
-          label="Description (optional)"
-          type="text"
-          fullWidth
-          variant="outlined"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          multiline
-          rows={3}
-        />
+      <DialogTitle>{dialogTitle}</DialogTitle>
+      <DialogContent dividers>
+        <form onSubmit={handleSubmit}>
+          {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+          <TextField
+            label="Nome do Ativo"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            fullWidth
+            margin="normal"
+            required
+            disabled={loading}
+          />
+          <TextField
+            label="Descrição (Opcional)"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            fullWidth
+            margin="normal"
+            multiline
+            rows={3}
+            disabled={loading}
+          />
+        </form>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} color="secondary" disabled={loading}>
-          Cancel
+          Cancelar
         </Button>
-        <Button onClick={handleUpdateAsset} color="primary" disabled={loading}>
-          {loading ? <CircularProgress size={24} /> : 'Save Changes'}
+        <Button onClick={handleSubmit} color="primary" variant="contained" disabled={loading}>
+          {loading ? <CircularProgress size={24} /> : submitButtonText}
         </Button>
       </DialogActions>
     </Dialog>

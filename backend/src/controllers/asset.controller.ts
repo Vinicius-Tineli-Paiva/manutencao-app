@@ -61,7 +61,7 @@ export const getAsset = async (req: Request, res: Response) => {
     if (!asset) {
       return res.status(404).json({ message: 'Asset not found or you do not have permission to view it.' });
     }
-    res.status(200).json({ asset });
+    res.status(200).json(asset);
   } catch (error) {
     console.error('Error in getAsset:', error);
     res.status(500).json({ message: 'Failed to retrieve asset.' });
