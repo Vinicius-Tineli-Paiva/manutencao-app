@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, Alert, CircularProgress } from '@mui/material';
 import { api } from '../api/api'; // Certifique-se de que o caminho está correto
-import { AxiosError } from 'axios';
 import type { Asset } from '../types';
 
 interface AddAssetResponse {
@@ -24,7 +23,7 @@ function AddAssetDialog({ open, onClose, onAssetAdded }: AddAssetDialogProps) {
   const [error, setError] = useState<string | null>(null);
 
   // Reseta o formulário e erros quando o modal é aberto ou fechado
-  React.useEffect(() => {
+  useEffect(() => {
     if (open) {
       setName('');
       setDescription('');
@@ -49,10 +48,14 @@ function AddAssetDialog({ open, onClose, onAssetAdded }: AddAssetDialogProps) {
       });
       onAssetAdded(response.data.asset);
       onClose(); // Fecha o modal
-    } catch (err) {
-      const axiosError = err as AxiosError;
-      console.error('Erro ao adicionar ativo:', axiosError.response?.data || axiosError.message);
-      setError((axiosError.response?.data as { message?: string })?.message || 'Falha ao adicionar ativo.');
+    } catch (err: any) {
+      if (err && err.response && err.response.data) {
+        console.error('Erro ao adicionar ativo:', err.response.data || err.message);
+        setError(err.response.data.message || 'Falha ao adicionar ativo.');
+      } else {
+        console.error('Um erro inesperado ocorreu:', err);
+        setError('Um erro inesperado ocorreu ao adicionar ativo.');
+      }
     } finally {
       setLoading(false);
     }

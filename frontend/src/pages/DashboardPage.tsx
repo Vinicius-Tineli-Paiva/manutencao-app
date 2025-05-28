@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Box, Typography, Button, CircularProgress, Alert, IconButton, List, ListItem } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import { api } from '../api/api';
-import { AxiosError } from 'axios';
+import type { AxiosError } from 'axios';
 import AddAssetDialog from '../components/AddAssetDialog';
 import EditAssetDialog from '../components/EditAssetDialog';
 import UpcomingMaintenances from '../components/maintenances/upcomingMaintenances'
@@ -224,7 +224,14 @@ function DashboardPage({ onLogout }: DashboardPageProps) {
                   <IconButton
                     aria-label="delete"
                     color="error"
-                    onClick={() => handleDeleteAsset(asset.id)}
+                    onClick={() => { 
+                        if (asset.id) { 
+                            handleDeleteAsset(asset.id);
+                        } else {
+                            console.warn("Attempted to delete asset with undefined ID.");
+                            alert("Erro: Não foi possível excluir o ativo sem um ID válido.");
+                        }
+                    }}
                   >
                     <DeleteIcon />
                   </IconButton>

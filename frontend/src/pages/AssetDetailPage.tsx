@@ -1,5 +1,5 @@
 // frontend/src/pages/AssetDetailPage.tsx
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Typography, Box, CircularProgress, Alert, Paper, Button } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
@@ -100,7 +100,7 @@ function AssetDetailPage() {
     setOpenAddMaintenanceDialog(true);
   };
 
-  const handleMaintenanceAdded = (newMaintenance: Maintenance) => {
+  const handleMaintenanceAdded = () => {
     setOpenAddMaintenanceDialog(false);
     setMaintenancesRefreshKey(prevKey => prevKey + 1); // Força o re-fetch das manutenções
   };

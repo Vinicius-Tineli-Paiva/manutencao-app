@@ -45,7 +45,7 @@ function AuthPage({ onLoginSuccess }: AuthPageProps) {
         setPassword('');
         onLoginSuccess();
       } else { // Registro
-        const response = await api.post<AuthResponse>('/auth/register', { username, email, password });
+        await api.post<AuthResponse>('/auth/register', { username, email, password });
         setMessage('Registro bem-sucedido! Faça login agora.');
         setTabValue(0);
         setUsername(''); // Limpa campos após registro

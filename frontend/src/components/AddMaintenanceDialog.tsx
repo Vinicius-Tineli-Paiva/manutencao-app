@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, Alert, CircularProgress, MenuItem, Box, Typography } from '@mui/material';
 import { AxiosError } from 'axios';
 import { api } from '../api/api'; 
@@ -10,6 +10,7 @@ interface AddMaintenanceDialogProps {
   open: boolean; // Controla se o modal está aberto
   onClose: () => void; // Função para fechar o modal
   onMaintenanceAdded: (newMaintenance: Maintenance) => void; // Função para notificar o pai de uma nova manutenção
+  initialAssetId?: string;
 }
 
 function AddMaintenanceDialog({ open, onClose, onMaintenanceAdded }: AddMaintenanceDialogProps) {

@@ -118,7 +118,14 @@ function AssetMaintenanceList({
                     <IconButton
                       aria-label="delete maintenance"
                       color="error"
-                      onClick={() => handleDeleteMaintenance(m.id)}
+                      onClick={() => {
+                          if (m.id) {
+                              handleDeleteMaintenance(m.id);
+                          } else {
+                              console.warn("Attempted to delete maintenance with undefined ID.");
+                              alert('Erro: ID da manutenção não encontrado.');
+                          }
+                      }}
                     >
                       <DeleteIcon />
                     </IconButton>
