@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Paper, Typography, Box, CircularProgress, Alert, List, ListItem, ListItemText, Divider, IconButton, Checkbox, FormControlLabel } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteIcon from '@mui/icons-material/Delete'; 
 import type { Maintenance } from '../../types';
 import { api } from '../../api/api';
 import { updateMaintenance } from '../../api/maintenanceApi';
@@ -79,7 +79,7 @@ function AssetMaintenanceList({
     } else {
       try {
         const updatedData = {
-          is_completed: isChecked, // false
+          is_completed: isChecked, 
           completion_date: null,
           notes: null,
         };
@@ -140,7 +140,6 @@ function AssetMaintenanceList({
           {error}
         </Alert>
       ) : (
-        // Aqui começa o React.Fragment que estava potencialmente causando o problema
         <React.Fragment>
           {/* SEÇÃO: Manutenções Pendentes */}
           <Typography variant="h6" sx={{ mt: 3, mb: 1 }}>
@@ -222,6 +221,14 @@ function AssetMaintenanceList({
                         >
                           <EditIcon />
                         </IconButton>
+                        {/* ICONE DA LIXEIRA AQUI PARA MANUTENÇÕES PENDENTES */}
+                        <IconButton
+                           aria-label="delete maintenance"
+                           color="error"
+                           onClick={() => { if (m.id) handleDeleteMaintenance(m.id); }}
+                         >
+                           <DeleteIcon />
+                         </IconButton>
                       </Box>
                     </ListItem>
                     <Divider component="li" />
@@ -298,6 +305,7 @@ function AssetMaintenanceList({
                       >
                         <EditIcon />
                       </IconButton>
+                      {/* ICONE DA LIXEIRA AQUI PARA MANUTENÇÕES CONCLUÍDAS */}
                       <IconButton
                         aria-label="delete maintenance"
                         color="error"
@@ -319,16 +327,16 @@ function AssetMaintenanceList({
               ))}
             </List>
           )}
-        </React.Fragment> // Fim do React.Fragment que inicia após o condicional de loading/error
-      )} {/* Este fechamento pertence ao bloco condicional de loading/error */}
+        </React.Fragment>
+      )}
 
-      {/* Modal para confirmar conclusão - Renderizado fora do condicional principal de loading/error */}
       <ConfirmCompletionDialog
         open={openConfirmCompletionDialog}
         onClose={() => setOpenConfirmCompletionDialog(false)}
         maintenance={maintenanceToConfirmCompletion}
         onConfirm={handleConfirmCompletion}
       />
+
     </Paper>
   );
 }

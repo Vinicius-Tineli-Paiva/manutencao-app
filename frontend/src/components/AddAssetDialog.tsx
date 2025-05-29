@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, Alert, CircularProgress } from '@mui/material';
-import { api } from '../api/api'; // Certifique-se de que o caminho está correto
+import { api } from '../api/api'; 
 import type { Asset } from '../types';
 
 interface AddAssetResponse {
