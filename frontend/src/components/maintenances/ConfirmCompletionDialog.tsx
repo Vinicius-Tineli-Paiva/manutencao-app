@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Stack, Typography, Alert, CircularProgress } from '@mui/material';
-import { format } from 'date-fns';
-import type { Maintenance } from '../../types'; // <<< Esta é a importação CORRETA
+import { format, isFuture, parseISO } from 'date-fns'; 
+import type { Maintenance } from '../../types';
 
 interface ConfirmCompletionDialogProps {
   open: boolean;
@@ -18,9 +18,8 @@ function ConfirmCompletionDialog({ open, onClose, maintenance, onConfirm }: Conf
 
   React.useEffect(() => {
     if (open) {
-      // Resetar estados ao abrir o modal, caso venha de uma tentativa anterior
-      setCompletionDate(format(new Date(), 'yyyy-MM-dd')); // Data atual padrão
-      setNotes(maintenance?.notes || ''); // Manter notas existentes se houver
+      setCompletionDate(format(new Date(), 'yyyy-MM-dd'));
+      setNotes(maintenance?.notes || '');
       setError(null);
       setLoading(false);
     }
@@ -36,15 +35,21 @@ function ConfirmCompletionDialog({ open, onClose, maintenance, onConfirm }: Conf
       return;
     }
 
+    // Validacao de data de conclusao
+    const selectedDate = parseISO(completionDate); // Converte a string para um objeto Date
+    const today = new Date();
+    const formattedSelectedDate = format(selectedDate, 'yyyy-MM-dd');
+    const formattedToday = format(today, 'yyyy-MM-dd');
+
+    if (isFuture(selectedDate) && formattedSelectedDate !== formattedToday) {
+      setError("A data de conclusão não pode ser uma data futura.");
+      return;
+    }
+
     setLoading(true);
     setError(null);
     try {
-      // Chama a função onConfirm passada via props
       await onConfirm(maintenance.id, completionDate, notes);
-      // O onClose será chamado pelo componente pai após a atualização bem-sucedida
-      // ou você pode chamá-lo aqui se preferir que o modal feche logo após a ação,
-      // independentemente da atualização na lista principal.
-      // onClose(); // Chama o onClose para fechar o modal
     } catch (err) {
       setError("Falha ao confirmar conclusão da manutenção. Tente novamente.");
       console.error("Erro ao confirmar conclusão no modal:", err);
@@ -76,8 +81,9 @@ function ConfirmCompletionDialog({ open, onClose, maintenance, onConfirm }: Conf
               InputLabelProps={{
                 shrink: true,
               }}
-              error={!!error && error.includes("data de conclusão")}
-              helperText={!!error && error.includes("data de conclusão") ? error : ''}
+              // A mensagem de erro agora considera a validação de data futura
+              error={!!error}
+              helperText={error}
             />
             <TextField
               label="Notas de Conclusão (Opcional)"
@@ -87,7 +93,6 @@ function ConfirmCompletionDialog({ open, onClose, maintenance, onConfirm }: Conf
               onChange={(e) => setNotes(e.target.value)}
               fullWidth
             />
-            {error && <Alert severity="error">{error}</Alert>}
           </Stack>
         ) : (
           <Alert severity="warning">Nenhuma manutenção selecionada para confirmação.</Alert>

@@ -1,8 +1,11 @@
-// frontend/src/pages/AssetDetailPage.tsx
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Container, Typography, Box, CircularProgress, Alert, Paper, Button } from '@mui/material';
+import { Container, Typography, Box, CircularProgress, Alert, Paper, Button, useTheme, Stack, IconButton, Grid } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import BuildIcon from '@mui/icons-material/Build'; 
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'; 
+
 import { api } from '../api/api';
 import { AxiosError } from 'axios';
 import type { Asset, Maintenance } from '../types';
@@ -14,6 +17,7 @@ import EditMaintenanceDialog from '../components/maintenances/EditMaintenanceDia
 function AssetDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const theme = useTheme(); 
 
   const [asset, setAsset] = useState<Asset | null>(null);
   const [maintenances, setMaintenances] = useState<Maintenance[]>([]);
@@ -39,7 +43,6 @@ function AssetDetailPage() {
     setLoadingAsset(true);
     setErrorAsset(null);
     try {
-      // Rota para buscar os detalhes de um ativo.
       const response = await api.get<Asset>(`/assets/${id}`);
       setAsset(response.data);
     } catch (err) {
@@ -79,11 +82,11 @@ function AssetDetailPage() {
     }
   };
 
-  // Chama fetchAsset e fetchMaintenances quando o ID muda
+  // Chama fetchAsset e fetchMaintenances quando o ID muda ou a chave de refresh
   useEffect(() => {
     fetchAsset();
-    fetchMaintenances(); 
-  }, [id, maintenancesRefreshKey]); 
+    fetchMaintenances();
+  }, [id, maintenancesRefreshKey]);
 
   const handleOpenEditAssetDialog = () => {
     setOpenEditAssetDialog(true);
@@ -97,6 +100,22 @@ function AssetDetailPage() {
   const handleAssetUpdated = (updatedAsset: Asset) => {
     setAsset(updatedAsset); // Atualiza o estado do ativo localmente
     handleCloseEditAssetDialog(); // Fecha o modal
+  };
+
+  const handleDeleteAsset = async () => {
+    if (!window.confirm('Tem certeza que deseja excluir este ativo? Todas as manutenções associadas também serão excluídas!')) {
+      return;
+    }
+    try {
+      if (asset?.id) {
+        await api.delete(`/assets/${asset.id}`);
+        alert('Ativo excluído com sucesso!');
+        navigate('/dashboard');
+      }
+    } catch (err) {
+      const axiosError = err as AxiosError;
+      alert(`Erro ao excluir ativo: ${(axiosError.response?.data as { message?: string })?.message || axiosError.message}`);
+    }
   };
 
   const handleAddMaintenance = () => {
@@ -117,126 +136,183 @@ function AssetDetailPage() {
     setOpenEditMaintenanceDialog(true);
   };
 
-    const handleCloseEditMaintenanceDialog = () => { 
+  const handleCloseEditMaintenanceDialog = () => {
     setOpenEditMaintenanceDialog(false);
-    setMaintenanceToEdit(null); 
+    setMaintenanceToEdit(null);
   };
 
-   const handleMaintenanceUpdated = (updatedMaintenance: Maintenance) => {
-       // Atualiza a lista localmente para refletir a mudança imediatamente
+  const handleMaintenanceUpdated = (updatedMaintenance: Maintenance) => {
+    // Atualiza a lista localmente para refletir a mudança imediatamente
     setMaintenances((prevMaintenances) =>
       prevMaintenances.map((m) => (m.id === updatedMaintenance.id ? updatedMaintenance : m))
     );
     handleCloseEditMaintenanceDialog();
     setMaintenancesRefreshKey(prevKey => prevKey + 1); 
   };
+
+  // Renderização de estados de carregamento/erro para o ativo 
   if (loadingAsset) {
     return (
-      <Container sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <Box sx={{
+        display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh',
+        background: `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.background.default} 100%)`
+      }}>
         <CircularProgress />
-        <Typography variant="h6" sx={{ ml: 2 }}>Carregando detalhes do ativo...</Typography>
-      </Container>
+        <Typography variant="h6" sx={{ ml: 2, color: theme.palette.text.secondary }}>Carregando detalhes do ativo...</Typography>
+      </Box>
     );
   }
 
   if (errorAsset) {
     return (
-      <Container sx={{ mt: 4 }}>
-        <Alert severity="error">{errorAsset}</Alert>
-        <Button variant="contained" onClick={() => navigate('/dashboard')} sx={{ mt: 2 }}>
+      <Box sx={{
+        display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100vh', p: 3,
+        background: `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.background.default} 100%)`
+      }}>
+        <Alert severity="error" sx={{ mb: 2, borderRadius: theme.shape.borderRadius }}>{errorAsset}</Alert>
+        <Button variant="contained" onClick={() => navigate('/dashboard')}>
           Voltar para o Dashboard
         </Button>
-      </Container>
+      </Box>
     );
   }
 
   if (!asset) {
     return (
-      <Container sx={{ mt: 4 }}>
-        <Alert severity="warning">Ativo não encontrado ou não carregado.</Alert>
-        <Button variant="contained" onClick={() => navigate('/dashboard')} sx={{ mt: 2 }}>
+      <Box sx={{
+        display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100vh', p: 3,
+        background: `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.background.default} 100%)`
+      }}>
+        <Alert severity="warning" sx={{ mb: 2, borderRadius: theme.shape.borderRadius }}>Ativo não encontrado ou não carregado.</Alert>
+        <Button variant="contained" onClick={() => navigate('/dashboard')}>
           Voltar para o Dashboard
         </Button>
-      </Container>
+      </Box>
     );
   }
 
   return (
-    <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4" component="h1">
-          Detalhes do Ativo: {asset.name} 
-        </Typography>
-        <Box>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleOpenEditAssetDialog}
-            startIcon={<EditIcon />}
-            sx={{ mr: 2 }}
-          >
-            Editar Ativo
-          </Button>
-          <Button
-            variant="contained"
-            color="success"
-            onClick={handleAddMaintenance}
-            sx={{ mr: 2 }}
-          >
-            Adicionar Manutenção
-          </Button>
-          <Button variant="outlined" color="secondary" onClick={() => navigate('/dashboard')}>
-            Voltar ao Dashboard
-          </Button>
-        </Box>
-      </Box>
+    <Box sx={{
+      background: `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.background.default} 100%)`,
+      minHeight: '100vh', 
+      width: '100vw', 
+      boxSizing: 'border-box', 
+      py: 4, 
+    }}>
+      <Container maxWidth="md"> 
+        {/* CORREÇÃO AQUI: elevation deve ser um número */}
+        <Paper elevation={6} sx={{ p: 4, borderRadius: theme.shape.borderRadius }}>
+          {/* Cabeçalho do Ativo */}
+          <Box sx={{
+            display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
+            justifyContent: 'space-between',
+            alignItems: { xs: 'flex-start', sm: 'center' },
+            mb: 3,
+            pb: 2,
+            borderBottom: `1px solid ${theme.palette.divider}`,
+          }}>
+            <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: { xs: 2, sm: 0 } }}>
+              <IconButton onClick={() => navigate('/dashboard')} color="primary" aria-label="voltar">
+                <ArrowBackIcon />
+              </IconButton>
+              <Typography variant="h4" component="h1" sx={{
+                fontWeight: theme.typography.fontWeightBold,
+                color: theme.palette.text.primary,
+              }}>
+                Detalhes do Ativo: {asset.name}
+              </Typography>
+            </Stack>
+            <Stack direction="row" spacing={1}>
+              <Button
+                variant="contained"
+                color="info" // Cor para editar
+                onClick={handleOpenEditAssetDialog}
+                startIcon={<EditIcon />}
+              >
+                Editar
+              </Button>
+              <Button
+                variant="outlined"
+                color="error"
+                onClick={handleDeleteAsset}
+                startIcon={<DeleteIcon />}
+              >
+                Excluir
+              </Button>
+            </Stack>
+          </Box>
 
-      <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
-        <Typography variant="h6" gutterBottom>
-          Informações do Ativo
-        </Typography>
-        <Typography variant="body1">
-          **Nome:** {asset.name}
-        </Typography>
-        <Typography variant="body1">
-          **Descrição:** {asset.description || 'Nenhuma descrição fornecida.'}
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-          Criado em: {asset.created_at ? new Date(asset.created_at).toLocaleDateString() : 'N/A'}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Última atualização: {asset.updated_at ? new Date(asset.updated_at).toLocaleDateString() : 'N/A'}
-        </Typography>
-      </Paper>
+          {/* Informações do Ativo */}
+          <Grid container spacing={2} sx={{ mb: 4 }}>
+            <Grid item xs={12}>
+              <Typography variant="subtitle1" color="text.secondary" gutterBottom>
+                Descrição: {asset.description || 'Nenhuma descrição fornecida.'}
+              </Typography>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Typography variant="subtitle1" color="text.secondary">
+                Criado em: {asset.created_at ? new Date(asset.created_at).toLocaleDateString() : 'N/A'}
+              </Typography>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Typography variant="subtitle1" color="text.secondary">
+                Última atualização: {asset.updated_at ? new Date(asset.updated_at).toLocaleDateString() : 'N/A'}
+              </Typography>
+            </Grid>
+          </Grid>
 
-      <AssetMaintenanceList
-        maintenances={maintenances}
-        loading={loadingMaintenances}
-        error={errorMaintenances}
-        onMaintenanceDeleted={handleMaintenanceDeleted}
-        onEditMaintenance={handleEditMaintenance}
-        onMaintenanceUpdated={handleMaintenanceUpdated}
-      />
+          {/* Seção de Manutenções delegada ao AssetMaintenanceList */}
+          <Box sx={{ mt: 4 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Typography variant="h5" component="h2" sx={{
+                fontWeight: theme.typography.fontWeightMedium,
+                color: theme.palette.primary.main,
+              }}>
+                Manutenções
+              </Typography>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleAddMaintenance}
+                startIcon={<BuildIcon />}
+              >
+                Adicionar Manutenção
+              </Button>
+            </Box>
 
-      {/* O asset deve existir para passá-lo ao EditAssetDialog */}
+            {/* O AssetMaintenanceList será renderizado AQUI, SEM MODIFICAÇÕES NESTE ARQUIVO. */}
+            <AssetMaintenanceList
+              maintenances={maintenances}
+              loading={loadingMaintenances}
+              error={errorMaintenances}
+              onMaintenanceDeleted={handleMaintenanceDeleted}
+              onEditMaintenance={handleEditMaintenance}
+              onMaintenanceUpdated={handleMaintenanceUpdated}
+            />
+          </Box>
+        </Paper>
+      </Container>
+
+      {/* Modals */}
       {asset && (
         <EditAssetDialog
           open={openEditAssetDialog}
           onClose={handleCloseEditAssetDialog}
-          assetToEdit={asset} // Passa o objeto asset completo para o modal de edição
+          assetToEdit={asset}
           onAssetUpdated={handleAssetUpdated}
         />
       )}
-      {asset && (
+      {asset && ( // Garante que asset.id existe antes de passar
         <AddMaintenanceDialog
           open={openAddMaintenanceDialog}
           onClose={() => setOpenAddMaintenanceDialog(false)}
           onMaintenanceAdded={handleMaintenanceAdded}
-          initialAssetId={asset.id}
+          initialAssetId={asset.id || ''} // Usando o id do asset como initialAssetId
         />
       )}
-      
-        {/* Renderização do EditMaintenanceDialog */}
+
+      {/* Renderização do EditMaintenanceDialog */}
       {maintenanceToEdit && (
         <EditMaintenanceDialog
           open={openEditMaintenanceDialog}
@@ -245,8 +321,7 @@ function AssetDetailPage() {
           onMaintenanceUpdated={handleMaintenanceUpdated}
         />
       )}
-
-    </Container>
+    </Box>
   );
 }
 

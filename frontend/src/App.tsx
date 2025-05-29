@@ -4,6 +4,9 @@ import DashboardPage from './pages/DashboardPage';
 import { Box, CircularProgress, Typography } from '@mui/material';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import AssetDetailPage from './pages/AssetDetailPage';
+import { ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import theme from './theme'; 
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -36,20 +39,23 @@ function App() {
   }
 
   return (
-    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-      <Routes>
-        <Route path="/login" element={<AuthPage onLoginSuccess={handleLoginSuccess} />} />
-        <Route
-          path="/dashboard"
-          element={isAuthenticated ? <DashboardPage onLogout={handleLogout} /> : <AuthPage onLoginSuccess={handleLoginSuccess} />}
-        />
-        <Route
-          path="/assets/:id" 
-          element={isAuthenticated ? <AssetDetailPage /> : <AuthPage onLoginSuccess={handleLoginSuccess} />}
-        />
-        <Route path="/" element={isAuthenticated ? <DashboardPage onLogout={handleLogout} /> : <AuthPage onLoginSuccess={handleLoginSuccess} />} />
-      </Routes>
-    </Router>
+    <ThemeProvider theme={theme}>
+      <CssBaseline /> 
+      <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <Routes>
+          <Route path="/login" element={<AuthPage onLoginSuccess={handleLoginSuccess} />} />
+          <Route
+            path="/dashboard"
+            element={isAuthenticated ? <DashboardPage onLogout={handleLogout} /> : <AuthPage onLoginSuccess={handleLoginSuccess} />}
+          />
+          <Route
+            path="/assets/:id"
+            element={isAuthenticated ? <AssetDetailPage /> : <AuthPage onLoginSuccess={handleLoginSuccess} />}
+          />
+          <Route path="/" element={isAuthenticated ? <DashboardPage onLogout={handleLogout} /> : <AuthPage onLoginSuccess={handleLoginSuccess} />} />
+        </Routes>
+      </Router>
+    </ThemeProvider>
   );
 }
 

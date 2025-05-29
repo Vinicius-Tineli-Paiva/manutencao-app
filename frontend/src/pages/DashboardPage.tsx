@@ -1,12 +1,31 @@
+// frontend/src/pages/DashboardPage.tsx
 import { useState, useEffect } from 'react';
-import { Box, Typography, Button, CircularProgress, Alert, IconButton, List, ListItem } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Button,
+  CircularProgress,
+  Alert,
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
+  Paper,
+  Grid,
+  useTheme,
+  Container,
+  Stack
+} from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import BuildIcon from '@mui/icons-material/Build';
+import LogoutIcon from '@mui/icons-material/Logout';
 import { api } from '../api/api';
 import type { AxiosError } from 'axios';
 import AddAssetDialog from '../components/AddAssetDialog';
 import EditAssetDialog from '../components/EditAssetDialog';
-import UpcomingMaintenances from '../components/maintenances/upcomingMaintenances'
+import UpcomingMaintenances from '../components/maintenances/upcomingMaintenances';
 import type { Asset } from '../types';
 import AddMaintenanceDialog from '../components/AddMaintenanceDialog';
 import { useNavigate } from 'react-router-dom';
@@ -17,6 +36,7 @@ interface DashboardPageProps {
 
 function DashboardPage({ onLogout }: DashboardPageProps) {
   const navigate = useNavigate();
+  const theme = useTheme();
 
   const [assets, setAssets] = useState<Asset[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,7 +47,6 @@ function DashboardPage({ onLogout }: DashboardPageProps) {
   const [openAddMaintenanceDialog, setOpenAddMaintenanceDialog] = useState(false);
   const [maintenancesRefreshKey, setMaintenancesRefreshKey] = useState(0);
 
-  // Função para buscar os ativos 
   const fetchAssets = async () => {
     try {
       setLoading(true);
@@ -43,64 +62,55 @@ function DashboardPage({ onLogout }: DashboardPageProps) {
     }
   };
 
-  // useEffect para carregar os ativos 
   useEffect(() => {
     fetchAssets();
   }, []);
 
-  // Função para abrir o modal de adicionar ativo
   const handleOpenAddAssetDialog = () => {
     setOpenAddAssetDialog(true);
   };
 
-  // Função para fechar o modal de adicionar ativo
   const handleCloseAddAssetDialog = () => {
     setOpenAddAssetDialog(false);
   };
 
-  // Função chamada pelo AddAssetDialog quando um ativo é adicionado com sucesso
   const handleAssetAdded = (newAsset: Asset) => {
-    setAssets((prevAssets) => [...prevAssets, newAsset]); // Adiciona o novo ativo à lista
-    handleCloseAddAssetDialog(); // Fecha o modal após adicionar
-    // Força o refresh em UpcomingMaintenances ao adicionar um novo ativo
+    setAssets((prevAssets) => [...prevAssets, newAsset]);
+    handleCloseAddAssetDialog();
     setMaintenancesRefreshKey(prevKey => prevKey + 1);
   };
 
-  // Função para abrir o modal de edição
   const handleOpenEditAssetDialog = (asset: Asset) => {
-    setAssetToEdit(asset); // Define qual ativo será editado
+    setAssetToEdit(asset);
     setOpenEditAssetDialog(true);
   };
 
-  // Função para fechar o modal de edição
   const handleCloseEditAssetDialog = () => {
     setOpenEditAssetDialog(false);
     setAssetToEdit(null);
   };
 
-  // Função chamada pelo EditAssetDialog quando um ativo é atualizado com sucesso
   const handleAssetUpdated = (updatedAsset: Asset) => {
     setAssets((prevAssets) =>
       prevAssets.map((asset) => (asset.id === updatedAsset.id ? updatedAsset : asset))
     );
     handleCloseEditAssetDialog();
-    fetchAssets(); // Re-fetch assets para garantir que as manutenções sejam atualizadas se o nome do ativo mudar
+    fetchAssets();
     setMaintenancesRefreshKey(prevKey => prevKey + 1);
   };
 
   const handleDeleteAsset = async (assetId: string) => {
     if (!window.confirm('Tem certeza que deseja excluir este ativo? Todas as manutenções associadas também serão excluídas!')) {
-      return; 
+      return;
     }
 
     try {
       setLoading(true);
       setError(null);
       await api.delete(`/assets/${assetId}`);
-      // Remove o ativo da lista localmente após a exclusão bem-sucedida
       setAssets((prevAssets) => prevAssets.filter((asset) => asset.id !== assetId));
-      //orça o refresh em UpcomingMaintenances ao deletar um ativo
       setMaintenancesRefreshKey(prevKey => prevKey + 1);
+      alert('Ativo excluído com sucesso!');
     } catch (err) {
       const axiosError = err as AxiosError;
       console.error('Error deleting asset:', axiosError.response?.data || axiosError.message);
@@ -110,139 +120,203 @@ function DashboardPage({ onLogout }: DashboardPageProps) {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogoutClick = () => {
     onLogout();
   };
 
   const handleMaintenanceAdded = () => {
-    setOpenAddMaintenanceDialog(false); // Fecha o modal
-    // Incrementa a chave para forçar o refresh das manutenções em UpcomingMaintenances
+    setOpenAddMaintenanceDialog(false);
     setMaintenancesRefreshKey(prevKey => prevKey + 1);
   };
 
   return (
-    <Box sx={{ p: 4 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-        <Typography variant="h4" component="h1">
-          Meus Ativos
-        </Typography>
-        <Box>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleOpenAddAssetDialog}
-            sx={{ mr: 2 }}
+    <Box sx={{
+      background: `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.background.default} 100%)`,
+      minHeight: '100vh',
+      width: '100vw',
+      boxSizing: 'border-box',
+      py: 4,
+    }}>
+      <Container maxWidth="xl">
+        {/* Cabeçalho da Página */}
+        <Box sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', md: 'row' },
+          justifyContent: 'space-between',
+          alignItems: { xs: 'flex-start', md: 'center' },
+          mb: 4,
+          pb: 2,
+          borderBottom: `1px solid ${theme.palette.divider}`,
+        }}>
+          <Typography variant="h4" component="h1" sx={{
+            fontWeight: theme.typography.fontWeightBold,
+            color: theme.palette.primary.main,
+            mb: { xs: 2, md: 0 },
+          }}>
+            Dashboard de Manutenção
+          </Typography>
+          <Stack
+            direction={{ xs: 'column', md: 'row' }}
+            spacing={2}
+            sx={{ width: { xs: '100%', md: 'auto' } }}
           >
-            Adicionar Ativo
-          </Button>
-
-          <Button
-            variant="contained"
-            color="success" 
-            onClick={() => setOpenAddMaintenanceDialog(true)}
-            sx={{ mr: 2 }}
-          >
-            Adicionar Manutenção
-          </Button>
-
-          <Button variant="outlined" color="secondary" onClick={handleLogout}>
-            Sair
-          </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleOpenAddAssetDialog}
+              startIcon={<AddCircleOutlineIcon />}
+              fullWidth={window.innerWidth < theme.breakpoints.values.md}
+            >
+              Adicionar Ativo
+            </Button>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={() => setOpenAddMaintenanceDialog(true)}
+              startIcon={<BuildIcon />}
+              fullWidth={window.innerWidth < theme.breakpoints.values.md}
+            >
+              Adicionar Manutenção
+            </Button>
+            <Button
+              variant="outlined"
+              color="inherit"
+              onClick={handleLogoutClick}
+              startIcon={<LogoutIcon />}
+              fullWidth={window.innerWidth < theme.breakpoints.values.md}
+            >
+              Sair
+            </Button>
+          </Stack>
         </Box>
-      </Box>
 
-      {/* Componente para exibir manutenções próximas/vencidas */}
-      <UpcomingMaintenances refreshKey={maintenancesRefreshKey} />
+        {/* Seção Principal de Conteúdo - Usando Grid para layout */}
+        <Grid container spacing={3}>
+          {/* Manutenções Próximas */}
+          <Grid item xs={12} md={5}>
+            {/* CORREÇÃO AQUI: elevation deve ser um número */}
+            <Paper elevation={3} sx={{ p: 3, height: '100%' }}>
+              <Typography variant="h6" gutterBottom align="center" sx={{
+                color: theme.palette.primary.main,
+                mb: 2
+              }}>
+                Manutenções Próximas / Vencidas
+              </Typography>
+              <UpcomingMaintenances refreshKey={maintenancesRefreshKey} />
+            </Paper>
+          </Grid>
 
-      {loading && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-          <CircularProgress />
-          <Typography variant="body1" sx={{ ml: 2 }}>Carregando ativos...</Typography>
-        </Box>
-      )}
+          {/* Lista de Ativos */}
+          <Grid item xs={12} md={7}>
+            {/* CORREÇÃO AQUI: elevation deve ser um número */}
+            <Paper elevation={3} sx={{ p: 3, height: '100%' }}>
+              <Typography variant="h6" gutterBottom sx={{ color: theme.palette.primary.main, mb: 2 }}>
+                Meus Ativos
+              </Typography>
 
-      {error && (
-        <Alert severity="error" sx={{ mt: 2 }}>
-          {error}
-        </Alert>
-      )}
-
-      {!loading && !error && assets.length === 0 && (
-        <Alert severity="info" sx={{ mt: 2 }}>
-          Você ainda não possui ativos registrados.
-        </Alert>
-      )}
-
-      {!loading && !error && assets.length > 0 && (
-        <Box sx={{ mt: 3 }}>
-          <Typography variant="h6">Lista de Ativos:</Typography>
-          {/* Usando componentes List e ListItem do Material-UI para melhor semântica e estilização */}
-          <List sx={{ mt: 1, bgcolor: 'background.paper', borderRadius: 1, p: 2 }}>
-            {assets.map((asset) => (
-              <ListItem
-                key={asset.id}
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  borderBottom: '1px solid #eee',
-                  '&:last-child': { borderBottom: 'none' }, // Remove a borda do último item
-                  py: 1.5,
-                }}
-              >
-                {/* Transforma o nome do ativo em um Button clicável para navegar. */}
-                {/* Usamos component="span" na Typography para que o Button não altere a semântica de texto. */}
-                <Typography variant="body1" component="span">
-                  <Button
-                    variant="text" // Estilo de botão de texto para parecer um link
-                    // Ao clicar, navega para a rota de detalhes do ativo usando o ID do ativo.
-                    onClick={() => navigate(`/assets/${asset.id}`)}
-                    sx={{
-                      textTransform: 'none', // Remove o uppercase padrão do botão
-                      justifyContent: 'flex-start', // Alinha o texto à esquerda
-                      p: 0, // Remove padding padrão do botão
-                      // Efeitos visuais no hover para simular um link
-                      '&:hover': {
-                        backgroundColor: 'transparent', // Mantém o background transparente no hover
-                        textDecoration: 'underline' // Adiciona sublinhado no hover
-                      }
-                    }}
-                  >
-                    <Typography variant="body1" component="span" fontWeight="bold">{asset.name}</Typography>
-                  </Button>
-                  {' '} - {asset.description || 'Nenhuma descrição.'}
-                </Typography>
-                <Box> {/* Agrupa os botões de Editar e Excluir */}
-                  <IconButton
-                    aria-label="edit"
-                    color="info" // Cor azul para o ícone de edição
-                    onClick={() => handleOpenEditAssetDialog(asset)} // Abre o modal de edição
-                    sx={{ mr: 1 }} // Margem à direita para separar
-                  >
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton
-                    aria-label="delete"
-                    color="error"
-                    onClick={() => { 
-                        if (asset.id) { 
-                            handleDeleteAsset(asset.id);
-                        } else {
-                            console.warn("Attempted to delete asset with undefined ID.");
-                            alert("Erro: Não foi possível excluir o ativo sem um ID válido.");
-                        }
-                    }}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
+              {loading && (
+                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+                  <CircularProgress size={24} />
+                  <Typography variant="body1" sx={{ ml: 2, color: theme.palette.text.secondary }}>Carregando ativos...</Typography>
                 </Box>
-              </ListItem>
-            ))}
-          </List>
-        </Box>
-      )}
+              )}
 
-      {/* Renderização dos componentes de modal */}
+              {error && (
+                <Alert severity="error" sx={{ mt: 2, borderRadius: theme.shape.borderRadius }}>
+                  {error}
+                </Alert>
+              )}
+
+              {!loading && !error && assets.length === 0 && (
+                <Alert severity="info" sx={{ mt: 2, borderRadius: theme.shape.borderRadius }}>
+                  Você ainda não possui ativos registrados. Clique em "Adicionar Ativo" para começar.
+                </Alert>
+              )}
+
+              {!loading && !error && assets.length > 0 && (
+                <List sx={{ mt: 1, p: 0 }}>
+                  {assets.map((asset) => (
+                    <ListItem
+                      key={asset.id}
+                      secondaryAction={
+                        <Stack direction="row" spacing={1}>
+                          <IconButton
+                            aria-label="edit"
+                            color="info"
+                            onClick={() => handleOpenEditAssetDialog(asset)}
+                          >
+                            <EditIcon />
+                          </IconButton>
+                          <IconButton
+                            aria-label="delete"
+                            color="error"
+                            onClick={() => {
+                              if (asset.id) {
+                                handleDeleteAsset(asset.id);
+                              } else {
+                                console.warn("Attempted to delete asset with undefined ID.");
+                                alert("Erro: Não foi possível excluir o ativo sem um ID válido.");
+                              }
+                            }}
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        </Stack>
+                      }
+                      sx={{
+                        backgroundColor: theme.palette.background.paper,
+                        borderRadius: theme.shape.borderRadius,
+                        mb: 1.5,
+                        boxShadow: theme.shadows[1],
+                        '&:hover': {
+                          boxShadow: theme.shadows[3],
+                          transform: 'translateY(-2px)',
+                          transition: '0.2s',
+                        },
+                        pr: { xs: 8, sm: 12 },
+                      }}
+                    >
+                      <ListItemText
+                        primary={
+                          <Button
+                            variant="text"
+                            onClick={() => navigate(`/assets/${asset.id}`)}
+                            sx={{
+                              textTransform: 'none',
+                              justifyContent: 'flex-start',
+                              p: 0,
+                              color: theme.palette.primary.main,
+                              '&:hover': {
+                                backgroundColor: 'transparent',
+                                textDecoration: 'underline',
+                                color: theme.palette.primary.dark,
+                              },
+                            }}
+                          >
+                            <Typography variant="body1" component="span" fontWeight="bold">
+                              {asset.name}
+                            </Typography>
+                          </Button>
+                        }
+                        secondary={
+                          <Typography variant="body2" color="text.secondary">
+                            {asset.description || 'Nenhuma descrição.'}
+                          </Typography>
+                        }
+                        sx={{
+                            maxWidth: { xs: 'calc(100% - 60px)', sm: 'calc(100% - 100px)' },
+                        }}
+                      />
+                    </ListItem>
+                  ))}
+                </List>
+              )}
+            </Paper>
+          </Grid>
+        </Grid>
+      </Container>
+
+      {/* Modals */}
       <AddAssetDialog
         open={openAddAssetDialog}
         onClose={handleCloseAddAssetDialog}
@@ -251,13 +325,14 @@ function DashboardPage({ onLogout }: DashboardPageProps) {
       <EditAssetDialog
         open={openEditAssetDialog}
         onClose={handleCloseEditAssetDialog}
-        assetToEdit={assetToEdit} // Passa o ativo que está sendo editado
-        onAssetUpdated={handleAssetUpdated} // Função para lidar com a atualização
+        assetToEdit={assetToEdit}
+        onAssetUpdated={handleAssetUpdated}
       />
       <AddMaintenanceDialog
         open={openAddMaintenanceDialog}
         onClose={() => setOpenAddMaintenanceDialog(false)}
         onMaintenanceAdded={handleMaintenanceAdded}
+        initialAssetId={''}
       />
     </Box>
   );

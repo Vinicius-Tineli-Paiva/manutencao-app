@@ -49,16 +49,12 @@ function AddMaintenanceDialog({ open, onClose, onMaintenanceAdded, initialAssetI
 
     setLoading(true);
     try {
-      // Cria o objeto de dados da nova manutenção
-      // 'id', 'created_at', 'updated_at', 'asset_name', 'asset_description'
-      // serão gerados pelo backend ou são irrelevantes na criação inicial
+
       const newMaintenanceData: Omit<Maintenance, 'id' | 'created_at' | 'updated_at' | 'asset_name' | 'asset_description' | 'completion_date' | 'is_completed'> = {
         asset_id: initialAssetId,
         service_description: serviceDescription.trim(),
-        next_due_date: nextDueDate ? nextDueDate : null, // Envia null se vazio
-        notes: notes ? notes.trim() : null, // Envia null se vazio
-        // is_completed e completion_date não são enviados pois são para manutenções CONCLUÍDAS
-        // O backend deve definir is_completed como false e completion_date como null por padrão na criação
+        next_due_date: nextDueDate ? nextDueDate : null, 
+        notes: notes ? notes.trim() : null, 
       };
 
       await createMaintenance(newMaintenanceData); // Chama a função da API
