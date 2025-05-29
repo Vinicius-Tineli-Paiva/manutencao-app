@@ -215,6 +215,7 @@ function AssetDetailPage() {
         error={errorMaintenances}
         onMaintenanceDeleted={handleMaintenanceDeleted}
         onEditMaintenance={handleEditMaintenance}
+        onMaintenanceUpdated={handleMaintenanceUpdated}
       />
 
       {/* O asset deve existir para passá-lo ao EditAssetDialog */}
