@@ -41,11 +41,15 @@ function AddMaintenanceDialog({ open, onClose, onMaintenanceAdded, initialAssetI
     event.preventDefault(); // Previne o comportamento padrão do formulário
     setError(null);
 
-    // Validação básica
     if (!serviceDescription.trim()) {
       setError('A descrição do serviço é obrigatória.');
       return;
     }
+
+    if (!nextDueDate) {
+      setError('A próxima data prevista é obrigatória.');
+    return;
+  }
 
     setLoading(true);
     try {
@@ -53,12 +57,12 @@ function AddMaintenanceDialog({ open, onClose, onMaintenanceAdded, initialAssetI
       const newMaintenanceData: Omit<Maintenance, 'id' | 'created_at' | 'updated_at' | 'asset_name' | 'asset_description' | 'completion_date' | 'is_completed'> = {
         asset_id: initialAssetId,
         service_description: serviceDescription.trim(),
-        next_due_date: nextDueDate ? nextDueDate : null, 
+        next_due_date: nextDueDate, 
         notes: notes ? notes.trim() : null, 
       };
 
-      await createMaintenance(newMaintenanceData); // Chama a função da API
-      onMaintenanceAdded(); // Notifica o componente pai que uma manutenção foi adicionada
+      await createMaintenance(newMaintenanceData); 
+      onMaintenanceAdded();
       onClose(); // Fecha o modal
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Falha ao adicionar manutenção.';
@@ -90,6 +94,7 @@ function AddMaintenanceDialog({ open, onClose, onMaintenanceAdded, initialAssetI
               value={nextDueDate}
               onChange={(e) => setNextDueDate(e.target.value)}
               fullWidth
+              required
               InputLabelProps={{
                 shrink: true,
               }}

@@ -54,9 +54,6 @@ const UpcomingMaintenances: React.FC<UpcomingMaintenancesProps> = ({ refreshKey 
 
   return (
     <Paper elevation={3} sx={{ p: 2, mt: 3 }}>
-      <Typography variant="h5" component="h2" gutterBottom>
-        Manutenções Próximas/Vencidas
-      </Typography>
       {maintenances.length === 0 ? (
         <Typography variant="body1">Nenhuma manutenção próxima ou vencida.</Typography>
       ) : (

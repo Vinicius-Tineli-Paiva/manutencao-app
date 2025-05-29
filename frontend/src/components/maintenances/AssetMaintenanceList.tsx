@@ -126,10 +126,6 @@ function AssetMaintenanceList({
 
   return (
     <Paper elevation={3} sx={{ p: 3 }}>
-      <Typography variant="h6" gutterBottom>
-        Manutenções do Ativo
-      </Typography>
-
       {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', my: 2 }}>
           <CircularProgress size={24} />

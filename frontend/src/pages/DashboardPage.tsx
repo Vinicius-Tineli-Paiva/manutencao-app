@@ -150,7 +150,7 @@ function DashboardPage({ onLogout }: DashboardPageProps) {
         }}>
           <Typography variant="h4" component="h1" sx={{
             fontWeight: theme.typography.fontWeightBold,
-            color: theme.palette.primary.main,
+            color: 'black',
             mb: { xs: 2, md: 0 },
           }}>
             Dashboard de Manutenção
@@ -168,15 +168,6 @@ function DashboardPage({ onLogout }: DashboardPageProps) {
               fullWidth={window.innerWidth < theme.breakpoints.values.md}
             >
               Adicionar Ativo
-            </Button>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={() => setOpenAddMaintenanceDialog(true)}
-              startIcon={<BuildIcon />}
-              fullWidth={window.innerWidth < theme.breakpoints.values.md}
-            >
-              Adicionar Manutenção
             </Button>
             <Button
               variant="outlined"
