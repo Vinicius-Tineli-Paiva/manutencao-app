@@ -1,12 +1,12 @@
 import { createTheme } from '@mui/material/styles';
 import { lightBlue, grey, green, red, orange } from '@mui/material/colors';
 
-const primaryColor = lightBlue[700]; // Um tom de azul claro para elementos principais
-const secondaryColor = grey[700];    // Um tom de cinza para elementos secundários
-const successColor = green[600];    // Para indicações de sucesso
-const errorColor = red[600];       // Para indicações de erro
-const warningColor = orange[600];  // Para indicações de atenção/aviso
-const infoColor = lightBlue[400];  // Para informações gerais
+const primaryColor = lightBlue[700]; 
+const secondaryColor = grey[700];    
+const successColor = green[600];   
+const errorColor = red[600];  
+const warningColor = orange[600]; 
+const infoColor = lightBlue[400]; 
 
 const theme = createTheme({
   palette: {

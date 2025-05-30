@@ -1,7 +1,7 @@
+// frontend/src/pages/AuthPage.tsx
 import React, { useState } from 'react';
 import { Box, Typography, Button, TextField, Paper, Tabs, Tab, CircularProgress, Alert } from '@mui/material';
 import { api } from '../api/api';
-import { AxiosError } from 'axios';
 import { useTheme } from '@mui/material/styles';
 
 interface AuthResponse {
@@ -23,6 +23,10 @@ function AuthPage({ onLoginSuccess }: AuthPageProps) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+
+  const [passwordValidationError, setPasswordValidationError] = useState(false);
+  const [helperTextPasswordValidation, setHelperTextPasswordValidation] = useState('');
+
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
     setMessage('');
@@ -30,29 +34,91 @@ function AuthPage({ onLoginSuccess }: AuthPageProps) {
     setUsername('');
     setEmail('');
     setPassword('');
+    setPasswordValidationError(false);
+    setHelperTextPasswordValidation('');
   };
 
+  // --- Função de Validação de Senha ---
+  const validatePassword = (pwd: string) => {
+    if (pwd.length < 8) {
+      setHelperTextPasswordValidation('A senha deve ter no mínimo 8 caracteres.');
+      return false;
+    }
+    // Adicione outras regras de complexidade aqui se desejar
+    // Ex: pelo menos uma letra maiúscula, um número e um caractere especial
+    if (!/[A-Z]/.test(pwd)) {
+      setHelperTextPasswordValidation('A senha deve conter ao menos uma letra maiúscula.');
+      return false;
+    }
+    if (!/[a-z]/.test(pwd)) {
+      setHelperTextPasswordValidation('A senha deve conter ao menos uma letra minúscula.');
+      return false;
+    }
+    if (!/[0-9]/.test(pwd)) {
+      setHelperTextPasswordValidation('A senha deve conter ao menos um número.');
+      return false;
+    }
+    if (!/[^A-Za-z0-9]/.test(pwd)) {
+      setHelperTextPasswordValidation('A senha deve conter ao menos um caractere especial.');
+      return false;
+    }
+
+    setHelperTextPasswordValidation(''); // Limpa o helper text se a senha for válida
+    return true;
+  };
+
+  // --- Handler para a mudança da senha (para validação em tempo real) ---
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newPassword = e.target.value;
+    setPassword(newPassword);
+    // Valida a senha apenas se estiver na aba de Registro
+    if (tabValue === 1) {
+      const isValid = validatePassword(newPassword);
+      setPasswordValidationError(!isValid); // Define o estado de erro do TextField
+    } else {
+      // Limpa validações se voltar para o login, onde a complexidade não é exigida
+      setPasswordValidationError(false);
+      setHelperTextPasswordValidation('');
+    }
+  };
+
+
   const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    setMessage('');
+    event.preventDefault(); 
     setError('');
+    setMessage('');
+    setPasswordValidationError(false);
+    setHelperTextPasswordValidation('');
+
+    if (tabValue === 1) { 
+      const isPasswordValid = validatePassword(password);
+      if (!isPasswordValid) {
+        setPasswordValidationError(true); 
+        setLoading(false); 
+        return; 
+      }
+    }
+
     setLoading(true);
 
     try {
-      if (tabValue === 0) { // Login
+      if (tabValue === 0) { 
         const response = await api.post<AuthResponse>('/auth/login', { identifier: email, password });
         localStorage.setItem('jwtToken', response.data.token);
-        setMessage('Login bem-sucedido!');
+        setMessage('Login bem-sucedido!'); 
         onLoginSuccess();
-      } else { // Registro
+      } else { 
         await api.post<AuthResponse>('/auth/register', { username, email, password });
-        setMessage('Registro bem-sucedido! Faça login agora.');
-        setTabValue(0);
+        setMessage('Registro bem-sucedido! Faça login agora.'); 
+        setTabValue(0); 
       }
-    } catch (err) {
-      const axiosError = err as AxiosError;
+    } catch (err: any) {
+      const axiosError = err;
       const errorMessage = (axiosError.response?.data as { message?: string })?.message || 'Ocorreu um erro inesperado.';
-      setError(errorMessage);
+
+      setError(errorMessage); 
+      setMessage(''); 
+
       console.error('Erro na autenticação:', axiosError.response?.data || axiosError.message);
     } finally {
       setLoading(false);
@@ -66,10 +132,9 @@ function AuthPage({ onLoginSuccess }: AuthPageProps) {
         justifyContent: 'center',
         alignItems: 'center',
         minHeight: '100vh',
-        width: '100vw', 
+        width: '100vw',
         padding: theme.spacing(2),
-        boxSizing: 'border-box', 
-        // Gradiente de fundo suave
+        boxSizing: 'border-box',
         background: `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.background.default} 100%)`,
       }}
     >
@@ -92,14 +157,14 @@ function AuthPage({ onLoginSuccess }: AuthPageProps) {
           color: theme.palette.primary.main,
           fontWeight: theme.typography.fontWeightBold,
         }}>
-          Gerenciamento de Manutenção
+          Gerenciador de Manutenção
         </Typography>
         <Typography variant="subtitle1" align="center" color="text.secondary" sx={{ mb: theme.spacing(3) }}>
           Acesse sua conta ou registre-se para começar
         </Typography>
 
         <Tabs value={tabValue} onChange={handleTabChange} centered sx={{ mb: theme.spacing(3) }}>
-          <Tab label="Login" sx={{ px: theme.spacing(4) }} />
+          <Tab label="Login" sx={{ px: theme.spacing(4)} } />
           <Tab label="Registrar" sx={{ px: theme.spacing(4) }} />
         </Tabs>
 
@@ -125,7 +190,7 @@ function AuthPage({ onLoginSuccess }: AuthPageProps) {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            sx={{ mb: theme.spacing(2) }}
+            sx={{ mb: theme.spacing(2)} }
           />
           <TextField
             label="Senha"
@@ -134,9 +199,11 @@ function AuthPage({ onLoginSuccess }: AuthPageProps) {
             fullWidth
             margin="normal"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={handlePasswordChange} 
             required
-            sx={{ mb: theme.spacing(3) }}
+            sx={{ mb: theme.spacing(3)} }
+            error={passwordValidationError} 
+            helperText={helperTextPasswordValidation} 
           />
 
           {error && (

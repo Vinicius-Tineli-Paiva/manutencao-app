@@ -1,28 +1,11 @@
 // frontend/src/pages/DashboardPage.tsx
 import { useState, useEffect } from 'react';
-import {
-  Box,
-  Typography,
-  Button,
-  CircularProgress,
-  Alert,
-  IconButton,
-  List,
-  ListItem,
-  ListItemText,
-  Paper,
-  Grid,
-  useTheme,
-  Container,
-  Stack
-} from '@mui/material';
+import { Box, Typography, Button, CircularProgress, Alert, IconButton, List, ListItem, ListItemText, Paper, Grid, useTheme, Container, Stack } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import BuildIcon from '@mui/icons-material/Build';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { api } from '../api/api';
-import type { AxiosError } from 'axios';
 import AddAssetDialog from '../components/AddAssetDialog';
 import EditAssetDialog from '../components/EditAssetDialog';
 import UpcomingMaintenances from '../components/maintenances/upcomingMaintenances';
@@ -53,8 +36,8 @@ function DashboardPage({ onLogout }: DashboardPageProps) {
       setError(null);
       const response = await api.get<{ assets: Asset[] }>('/assets');
       setAssets(response.data.assets);
-    } catch (err) {
-      const axiosError = err as AxiosError;
+    } catch (err: any) {
+      const axiosError = err;
       console.error('Erro ao buscar ativos:', axiosError.response?.data || axiosError.message);
       setError((axiosError.response?.data as { message?: string })?.message || 'Falha ao carregar ativos.');
     } finally {
@@ -100,7 +83,7 @@ function DashboardPage({ onLogout }: DashboardPageProps) {
   };
 
   const handleDeleteAsset = async (assetId: string) => {
-    if (!window.confirm('Tem certeza que deseja excluir este ativo? Todas as manutenções associadas também serão excluídas!')) {
+    if (!window.confirm('Tem certeza que deseja excluir este ativo?')) {
       return;
     }
 
@@ -111,8 +94,8 @@ function DashboardPage({ onLogout }: DashboardPageProps) {
       setAssets((prevAssets) => prevAssets.filter((asset) => asset.id !== assetId));
       setMaintenancesRefreshKey(prevKey => prevKey + 1);
       alert('Ativo excluído com sucesso!');
-    } catch (err) {
-      const axiosError = err as AxiosError;
+    } catch (err: any) {
+      const axiosError = err;
       console.error('Error deleting asset:', axiosError.response?.data || axiosError.message);
       setError((axiosError.response?.data as { message?: string })?.message || 'Failed to delete asset.');
     } finally {
@@ -184,8 +167,7 @@ function DashboardPage({ onLogout }: DashboardPageProps) {
         {/* Seção Principal de Conteúdo - Usando Grid para layout */}
         <Grid container spacing={3}>
           {/* Manutenções Próximas */}
-          <Grid item xs={12} md={5}>
-            {/* CORREÇÃO AQUI: elevation deve ser um número */}
+          <Grid>
             <Paper elevation={3} sx={{ p: 3, height: '100%' }}>
               <Typography variant="h6" gutterBottom align="center" sx={{
                 color: theme.palette.primary.main,
@@ -198,7 +180,7 @@ function DashboardPage({ onLogout }: DashboardPageProps) {
           </Grid>
 
           {/* Lista de Ativos */}
-          <Grid item xs={12} md={7}>
+          <Grid>
             {/* CORREÇÃO AQUI: elevation deve ser um número */}
             <Paper elevation={3} sx={{ p: 3, height: '100%' }}>
               <Typography variant="h6" gutterBottom sx={{ color: theme.palette.primary.main, mb: 2 }}>
@@ -296,6 +278,8 @@ function DashboardPage({ onLogout }: DashboardPageProps) {
                         }
                         sx={{
                             maxWidth: { xs: 'calc(100% - 60px)', sm: 'calc(100% - 100px)' },
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
                         }}
                       />
                     </ListItem>

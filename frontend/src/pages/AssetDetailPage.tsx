@@ -7,7 +7,6 @@ import BuildIcon from '@mui/icons-material/Build';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'; 
 
 import { api } from '../api/api';
-import { AxiosError } from 'axios';
 import type { Asset, Maintenance } from '../types';
 import EditAssetDialog from '../components/EditAssetDialog';
 import AddMaintenanceDialog from '../components/AddMaintenanceDialog';
@@ -45,8 +44,8 @@ function AssetDetailPage() {
     try {
       const response = await api.get<Asset>(`/assets/${id}`);
       setAsset(response.data);
-    } catch (err) {
-      const axiosError = err as AxiosError;
+    } catch (err: any) {
+      const axiosError = err;
       console.error('Erro ao buscar detalhes do ativo:', axiosError.response?.data || axiosError.message);
       setErrorAsset((axiosError.response?.data as { message?: string })?.message || 'Falha ao carregar detalhes do ativo.');
       setAsset(null);
@@ -72,8 +71,8 @@ function AssetDetailPage() {
         return dateA - dateB;
       });
       setMaintenances(sortedMaintenances);
-    } catch (err) {
-      const axiosError = err as AxiosError;
+    } catch (err: any) {
+      const axiosError = err;
       console.error('Erro ao buscar manutenções do ativo:', axiosError.response?.data || axiosError.message);
       setErrorMaintenances((axiosError.response?.data as { message?: string })?.message || 'Falha ao carregar manutenções.');
       setMaintenances([]);
@@ -112,8 +111,8 @@ function AssetDetailPage() {
         alert('Ativo excluído com sucesso!');
         navigate('/dashboard');
       }
-    } catch (err) {
-      const axiosError = err as AxiosError;
+    } catch (err: any) {
+      const axiosError = err;
       alert(`Erro ao excluir ativo: ${(axiosError.response?.data as { message?: string })?.message || axiosError.message}`);
     }
   };
@@ -245,17 +244,17 @@ function AssetDetailPage() {
 
           {/* Informações do Ativo */}
           <Grid container spacing={2} sx={{ mb: 4 }}>
-            <Grid item xs={12}>
+            <Grid>
               <Typography variant="subtitle1" color="text.secondary" gutterBottom>
                 Descrição: {asset.description || 'Nenhuma descrição fornecida.'}
               </Typography>
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid>
               <Typography variant="subtitle1" color="text.secondary">
                 Criado em: {asset.created_at ? new Date(asset.created_at).toLocaleDateString() : 'N/A'}
               </Typography>
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid>
               <Typography variant="subtitle1" color="text.secondary">
                 Última atualização: {asset.updated_at ? new Date(asset.updated_at).toLocaleDateString() : 'N/A'}
               </Typography>

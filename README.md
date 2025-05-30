@@ -1,4 +1,4 @@
-Asset Maintenance Tracker
+Asset Maintenance Manager
 A full-stack web application designed to help users manage their assets and track their maintenance schedules efficiently. This application provides a dashboard for an overview of upcoming and overdue maintenances, and detailed views for each asset and its associated maintenance history.
 
 ---
@@ -134,10 +134,10 @@ Install Dependencies:
 Bash
 npm install
 
-Start the Frontend Development Server:
+Start the Frontend:
 
 Bash
-npm run dev
+npm start
 The frontend application should now be running, typically on http://localhost:5173 (or another port Vite assigns).
 
 ---

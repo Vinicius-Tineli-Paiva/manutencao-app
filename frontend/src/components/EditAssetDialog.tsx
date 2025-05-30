@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, CircularProgress, Alert } from '@mui/material';
 import { api } from '../api/api';
-import { AxiosError } from 'axios';
 import type { Asset } from '../types';
 
 interface EditAssetDialogProps {
@@ -56,8 +55,8 @@ function EditAssetDialog({ open, onClose, assetToEdit, onAssetUpdated, onAssetAd
         }
       }
       onClose(); 
-    } catch (err) {
-      const axiosError = err as AxiosError;
+    } catch (err: any) {
+      const axiosError = err;
       console.error('Error updating/adding asset:', axiosError.response?.data || axiosError.message);
       setError((axiosError.response?.data as { message?: string })?.message || 'Falha ao salvar o ativo.');
     } finally {

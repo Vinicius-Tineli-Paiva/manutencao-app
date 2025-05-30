@@ -35,7 +35,7 @@ export const register = async (req: Request, res: Response) => {
     }
   } catch (error: any) {
     console.error('Registration error:', error);
-    if (error.message.includes('Username or email already exists')) {
+    if (error.message.includes('Usuário ou e-mail já cadastrados')) {
       return res.status(409).json({ message: error.message });
     }
     return res.status(500).json({ message: 'Internal server error during registration.' });
@@ -50,20 +50,20 @@ export const login = async (req: Request, res: Response) => {
   const { identifier, password } = req.body; // 'identifier' can be username or email
 
   if (!identifier || !password) {
-    return res.status(400).json({ message: 'Identifier (username/email) and password are required.' });
+    return res.status(400).json({ message: 'E-mail e senha são necessários' });
   }
 
   try {
     const user = await findUserByIdentifier(identifier);
 
     if (!user) {
-      return res.status(401).json({ message: 'Invalid credentials.' });
+      return res.status(401).json({ message: 'Usuário ou senha inválidos' });
     }
 
     const isPasswordValid = await comparePassword(password, user.password_hash);
 
     if (!isPasswordValid) {
-      return res.status(401).json({ message: 'Invalid credentials.' });
+      return res.status(401).json({ message: 'Usuário ou senha inválidos' });
     }
 
     // Generate JWT token

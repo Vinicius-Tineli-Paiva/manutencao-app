@@ -24,14 +24,14 @@ export const authenticateToken = (req: Request, res: Response, next: NextFunctio
 
   if (token == null) {
     // No token provided
-    return res.status(401).json({ message: 'Authentication required: No token provided.' });
+    return res.status(401).json({ message: 'Autenticação necessária' });
   }
 
   const decoded = verifyToken(token);
 
   if (!decoded) {
     // Token is invalid or expired
-    return res.status(403).json({ message: 'Forbidden: Invalid or expired token.' });
+    return res.status(403).json({ message: 'Proibido: Token inválido ou expirado' });
   }
 
   // If token is valid, attach the user ID to the request object

@@ -37,10 +37,6 @@ const startServer = async () => {
 
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
-    console.log(`Access it at http://localhost:${PORT}`);
-    console.log(`Auth routes are available at http://localhost:${PORT}/api/auth`);
-    console.log(`Asset routes are available at http://localhost:${PORT}/api/assets`);
-    console.log(`Maintenance routes are available at http://localhost:${PORT}/api/maintenances`);
   });
 };
 

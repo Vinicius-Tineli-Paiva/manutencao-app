@@ -31,11 +31,24 @@ api.interceptors.response.use(
   (error) => {
     // Verifique se o erro é uma resposta HTTP e se o status é 401 (Não autorizado) ou 403 (Proibido)
     if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+        // Obtenha a URL da requisição que gerou o erro
+        const originalRequestUrl = error.config.url;
+
+        // **PONTO CHAVE: NÃO REDIRECIONE se a requisição original for para login ou registro**
+        // Isso permite que o componente AuthPage.tsx lide com o erro de credenciais.
+        if (originalRequestUrl && (originalRequestUrl.includes('/auth/login') || originalRequestUrl.includes('/auth/register'))) {
+            // Apenas loga e passa o erro adiante para o bloco catch do componente
+            console.warn('Erro de autenticação para login/registro. Permitindo que o componente trate.');
+            return Promise.reject(error);
+        }
+
         console.warn('Token inválido ou expirado. Redirecionando para login.');
         // Limpa o token para garantir que o usuário não tente usar um token inválido novamente
         localStorage.removeItem('jwtToken');
         // Redireciona o usuário para a página inicial (que deve levar ao login se não autenticado)
-        window.location.href = '/';
+        // Você pode usar o history/navigate aqui se estiver dentro de um contexto React Router
+        // Mas para simplificar, window.location.href é aceitável para um redirect global
+        window.location.href = '/'; 
     }
     return Promise.reject(error); // Rejeita a Promise para que o erro seja tratado no catch() do componente
   }
