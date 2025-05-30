@@ -51,7 +51,7 @@ PostgreSQL: Database system.
 
 Bash
 git clone <repository-url> # Replace with your actual repository URL
-cd asset-manutencao-app # Navigate into the project's root directory
+cd manutencao-app # Navigate into the project's root directory
 
 2. Database Setup
 
@@ -194,3 +194,5 @@ Make your changes.
 Commit your changes (git commit -m 'feat: Add new feature').
 Push to the branch (git push origin feature/your-feature-name).
 Open a Pull Request.
+
+link: https://github.com/Vinicius-Tineli-Paiva/manutencao-app
