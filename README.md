@@ -51,7 +51,7 @@ PostgreSQL: Database system.
 
 Bash
 git clone <repository-url> # Replace with your actual repository URL
-cd asset-maintenance-tracker # Navigate into the project's root directory
+cd asset-manutencao-app # Navigate into the project's root directory
 
 2. Database Setup
 

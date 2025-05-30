@@ -19,11 +19,9 @@ declare global {
 export const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
   // Get the Authorization header value
   const authHeader = req.headers['authorization'];
-  // The token typically comes in the format "Bearer <TOKEN>"
   const token = authHeader && authHeader.split(' ')[1];
 
   if (token == null) {
-    // No token provided
     return res.status(401).json({ message: 'Autenticação necessária' });
   }
 

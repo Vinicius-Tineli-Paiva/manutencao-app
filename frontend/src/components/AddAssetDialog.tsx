@@ -5,14 +5,13 @@ import type { Asset } from '../types';
 
 interface AddAssetResponse {
   message: string;
-  asset: Asset; // O backend retorna o ativo criado dentro de 'asset'
+  asset: Asset; 
 }
 
-// Definindo as props que o AddAssetDialog receberá
 interface AddAssetDialogProps {
-  open: boolean; // Controla se o modal está aberto
-  onClose: () => void; // Função para fechar o modal
-  onAssetAdded: (newAsset: Asset) => void; // Função para notificar o pai de um novo ativo
+  open: boolean; 
+  onClose: () => void; 
+  onAssetAdded: (newAsset: Asset) => void;
 }
 
 
@@ -41,13 +40,13 @@ function AddAssetDialog({ open, onClose, onAssetAdded }: AddAssetDialogProps) {
     setError(null);
 
     try {
-      // Envia os dados do novo ativo para o backend
+      // Send new data to backend
       const response = await api.post<AddAssetResponse>('/assets', {
         name,
         description,
       });
       onAssetAdded(response.data.asset);
-      onClose(); // Fecha o modal
+      onClose(); 
     } catch (err: any) {
       if (err && err.response && err.response.data) {
         console.error('Erro ao adicionar ativo:', err.response.data || err.message);

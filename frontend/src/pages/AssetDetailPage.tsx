@@ -32,7 +32,7 @@ function AssetDetailPage() {
 
   const [maintenancesRefreshKey, setMaintenancesRefreshKey] = useState(0);
 
-  // Função para buscar os detalhes do ativo
+  // Search for asset details
   const fetchAsset = async () => {
     if (!id) {
       setErrorAsset('ID do ativo não fornecido.');
@@ -54,7 +54,7 @@ function AssetDetailPage() {
     }
   };
 
-  // Função para buscar as manutenções do ativo
+  // Search for asset maintenances
   const fetchMaintenances = async () => {
     if (!id) {
       setErrorMaintenances('ID do ativo não fornecido para buscar manutenções.');
@@ -81,7 +81,6 @@ function AssetDetailPage() {
     }
   };
 
-  // Chama fetchAsset e fetchMaintenances quando o ID muda ou a chave de refresh
   useEffect(() => {
     fetchAsset();
     fetchMaintenances();
@@ -93,16 +92,16 @@ function AssetDetailPage() {
 
   const handleCloseEditAssetDialog = () => {
     setOpenEditAssetDialog(false);
-    fetchAsset(); // Re-fetch asset para garantir que os detalhes sejam atualizados após edição
+    fetchAsset(); // Re-fetch asset to update details
   };
 
   const handleAssetUpdated = (updatedAsset: Asset) => {
-    setAsset(updatedAsset); // Atualiza o estado do ativo localmente
-    handleCloseEditAssetDialog(); // Fecha o modal
+    setAsset(updatedAsset); 
+    handleCloseEditAssetDialog(); 
   };
 
   const handleDeleteAsset = async () => {
-    if (!window.confirm('Tem certeza que deseja excluir este ativo? Todas as manutenções associadas também serão excluídas!')) {
+    if (!window.confirm('Tem certeza que deseja excluir este ativo?')) {
       return;
     }
     try {
@@ -123,11 +122,11 @@ function AssetDetailPage() {
 
   const handleMaintenanceAdded = () => {
     setOpenAddMaintenanceDialog(false);
-    setMaintenancesRefreshKey(prevKey => prevKey + 1); // Força o re-fetch das manutenções
+    setMaintenancesRefreshKey(prevKey => prevKey + 1); 
   };
 
   const handleMaintenanceDeleted = () => {
-    setMaintenancesRefreshKey(prevKey => prevKey + 1); // Força o re-fetch das manutenções
+    setMaintenancesRefreshKey(prevKey => prevKey + 1); 
   };
 
   const handleEditMaintenance = (maintenance: Maintenance) => {
@@ -141,7 +140,6 @@ function AssetDetailPage() {
   };
 
   const handleMaintenanceUpdated = (updatedMaintenance: Maintenance) => {
-    // Atualiza a lista localmente para refletir a mudança imediatamente
     setMaintenances((prevMaintenances) =>
       prevMaintenances.map((m) => (m.id === updatedMaintenance.id ? updatedMaintenance : m))
     );
@@ -149,7 +147,6 @@ function AssetDetailPage() {
     setMaintenancesRefreshKey(prevKey => prevKey + 1); 
   };
 
-  // Renderização de estados de carregamento/erro para o ativo 
   if (loadingAsset) {
     return (
       <Box sx={{
@@ -199,9 +196,8 @@ function AssetDetailPage() {
       py: 4, 
     }}>
       <Container maxWidth="md"> 
-        {/* CORREÇÃO AQUI: elevation deve ser um número */}
         <Paper elevation={6} sx={{ p: 4, borderRadius: theme.shape.borderRadius }}>
-          {/* Cabeçalho do Ativo */}
+          {/* Header */}
           <Box sx={{
             display: 'flex',
             flexDirection: { xs: 'column', sm: 'row' },
@@ -225,7 +221,7 @@ function AssetDetailPage() {
             <Stack direction="row" spacing={1}>
               <Button
                 variant="contained"
-                color="info" // Cor para editar
+                color="info" 
                 onClick={handleOpenEditAssetDialog}
                 startIcon={<EditIcon />}
               >
@@ -242,7 +238,7 @@ function AssetDetailPage() {
             </Stack>
           </Box>
 
-          {/* Informações do Ativo */}
+          {/* Asset Information */}
           <Grid container spacing={2} sx={{ mb: 4 }}>
             <Grid>
               <Typography variant="subtitle1" color="text.secondary" gutterBottom>
@@ -261,7 +257,7 @@ function AssetDetailPage() {
             </Grid>
           </Grid>
 
-          {/* Seção de Manutenções delegada ao AssetMaintenanceList */}
+          {/* AssetMaintenanceList */}
           <Box sx={{ mt: 4 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
               <Typography variant="h5" component="h2" sx={{
@@ -280,7 +276,7 @@ function AssetDetailPage() {
               </Button>
             </Box>
 
-            {/* O AssetMaintenanceList será renderizado AQUI, SEM MODIFICAÇÕES NESTE ARQUIVO. */}
+            {/* AssetMaintenanceList render */}
             <AssetMaintenanceList
               maintenances={maintenances}
               loading={loadingMaintenances}
@@ -302,16 +298,16 @@ function AssetDetailPage() {
           onAssetUpdated={handleAssetUpdated}
         />
       )}
-      {asset && ( // Garante que asset.id existe antes de passar
+      {asset && ( 
         <AddMaintenanceDialog
           open={openAddMaintenanceDialog}
           onClose={() => setOpenAddMaintenanceDialog(false)}
           onMaintenanceAdded={handleMaintenanceAdded}
-          initialAssetId={asset.id || ''} // Usando o id do asset como initialAssetId
+          initialAssetId={asset.id || ''} 
         />
       )}
 
-      {/* Renderização do EditMaintenanceDialog */}
+      {/* EditMaintenanceDialog render */}
       {maintenanceToEdit && (
         <EditMaintenanceDialog
           open={openEditMaintenanceDialog}

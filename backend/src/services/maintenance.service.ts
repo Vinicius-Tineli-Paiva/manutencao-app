@@ -13,7 +13,6 @@ export const createMaintenance = async (maintenance: Omit<Maintenance, 'id' | 'c
     VALUES ($1, $2, $3, $4, $5, $6)
     RETURNING id, asset_id, service_description, completion_date, next_due_date, notes, is_completed, created_at, updated_at;
   `;
-  // Usa '?? false' para garantir que is_completed tenha um valor booleano padrão
   const values = [asset_id, service_description, completion_date || null, next_due_date || null, notes, is_completed ?? false];
   try {
     const result = await query(text, values);
@@ -91,19 +90,16 @@ export const updateMaintenance = async (
   }
   if (completion_date !== undefined) {
     setClauses.push(`completion_date = $${paramIndex++}`);
-    // Se completion_date for vazia, guarda como NULL no banco
     values.push(completion_date === '' ? null : completion_date);
   }
   if (next_due_date !== undefined) {
     setClauses.push(`next_due_date = $${paramIndex++}`);
-    // Se next_due_date for vazia, guarda como NULL no banco
     values.push(next_due_date === '' ? null : next_due_date);
   }
   if (notes !== undefined) {
     setClauses.push(`notes = $${paramIndex++}`);
     values.push(notes);
   }
-  // Adiciona is_completed para atualização
   if (is_completed !== undefined) {
     setClauses.push(`is_completed = $${paramIndex++}`);
     values.push(is_completed);

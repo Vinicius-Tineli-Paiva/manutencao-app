@@ -1,12 +1,5 @@
 import { Request, Response } from 'express';
-import {
-  createMaintenance,
-  getMaintenanceLogsByAssetId,
-  getMaintenanceByIdAndAssetId,
-  updateMaintenance,
-  deleteMaintenance,
-  getUpcomingAndOverdueMaintenances
-} from '../services/maintenance.service';
+import { createMaintenance, getMaintenanceLogsByAssetId, getMaintenanceByIdAndAssetId, updateMaintenance, deleteMaintenance, getUpcomingAndOverdueMaintenances } from '../services/maintenance.service';
 import { getAssetByIdAndUserId } from '../services/asset.service'; // Para verificar a posse do ativo
 
 /**

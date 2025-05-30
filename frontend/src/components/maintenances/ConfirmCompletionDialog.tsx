@@ -35,8 +35,7 @@ function ConfirmCompletionDialog({ open, onClose, maintenance, onConfirm }: Conf
       return;
     }
 
-    // Validacao de data de conclusao
-    const selectedDate = parseISO(completionDate); // Converte a string para um objeto Date
+    const selectedDate = parseISO(completionDate);
     const today = new Date();
     const formattedSelectedDate = format(selectedDate, 'yyyy-MM-dd');
     const formattedToday = format(today, 'yyyy-MM-dd');
@@ -81,7 +80,6 @@ function ConfirmCompletionDialog({ open, onClose, maintenance, onConfirm }: Conf
               InputLabelProps={{
                 shrink: true,
               }}
-              // A mensagem de erro agora considera a validação de data futura
               error={!!error}
               helperText={error}
             />

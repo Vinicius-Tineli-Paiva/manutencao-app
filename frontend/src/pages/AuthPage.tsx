@@ -38,14 +38,12 @@ function AuthPage({ onLoginSuccess }: AuthPageProps) {
     setHelperTextPasswordValidation('');
   };
 
-  // --- Função de Validação de Senha ---
+  // Password validation 
   const validatePassword = (pwd: string) => {
     if (pwd.length < 8) {
       setHelperTextPasswordValidation('A senha deve ter no mínimo 8 caracteres.');
       return false;
     }
-    // Adicione outras regras de complexidade aqui se desejar
-    // Ex: pelo menos uma letra maiúscula, um número e um caractere especial
     if (!/[A-Z]/.test(pwd)) {
       setHelperTextPasswordValidation('A senha deve conter ao menos uma letra maiúscula.');
       return false;
@@ -63,20 +61,17 @@ function AuthPage({ onLoginSuccess }: AuthPageProps) {
       return false;
     }
 
-    setHelperTextPasswordValidation(''); // Limpa o helper text se a senha for válida
+    setHelperTextPasswordValidation(''); 
     return true;
   };
 
-  // --- Handler para a mudança da senha (para validação em tempo real) ---
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newPassword = e.target.value;
     setPassword(newPassword);
-    // Valida a senha apenas se estiver na aba de Registro
     if (tabValue === 1) {
       const isValid = validatePassword(newPassword);
-      setPasswordValidationError(!isValid); // Define o estado de erro do TextField
+      setPasswordValidationError(!isValid); 
     } else {
-      // Limpa validações se voltar para o login, onde a complexidade não é exigida
       setPasswordValidationError(false);
       setHelperTextPasswordValidation('');
     }

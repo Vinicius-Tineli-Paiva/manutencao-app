@@ -23,17 +23,14 @@ function EditMaintenanceDialog({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Efeito para carregar os dados da manutenção no formulário quando o modal abre ou a manutenção muda
   useEffect(() => {
     if (open && maintenanceToEdit) {
       setServiceDescription(maintenanceToEdit.service_description);
-      // Formata as datas para o formato 'YYYY-MM-DD' esperado pelo input type="date"
       setCompletionDate(maintenanceToEdit.completion_date ? new Date(maintenanceToEdit.completion_date).toISOString().split('T')[0] : '');
       setNextDueDate(maintenanceToEdit.next_due_date ? new Date(maintenanceToEdit.next_due_date).toISOString().split('T')[0] : '');
       setNotes(maintenanceToEdit.notes || '');
       setError(null);
     } else if (!open) {
-      // Limpa os campos quando o modal fecha
       setServiceDescription('');
       setCompletionDate('');
       setNextDueDate('');
@@ -63,20 +60,18 @@ function EditMaintenanceDialog({
         notes: notes || null, 
       };
 
-      // Rota de PUT para atualizar uma manutenção específica de um ativo
       const response = await api.put<Maintenance>(
         `/maintenances/asset/${maintenanceToEdit.asset_id}/${maintenanceToEdit.id}`,
         updatedData
       );
       onMaintenanceUpdated(response.data); 
-      onClose(); // Fecha o modal
-    } catch (err: unknown) { // Use 'unknown' para a captura do erro
-      // Verificação mais genérica e robusta para erros do Axios
-      if (typeof err === 'object' && err !== null && 'response' in err && (err as any).response.data) { // Aqui 'any' é um fallback seguro para a propriedade 'data'
+      onClose();
+    } catch (err: unknown) { 
+      if (typeof err === 'object' && err !== null && 'response' in err && (err as any).response.data) { 
         const errorMessage = (err as any).response.data.message || 'Falha na requisição.';
         console.error('Erro de requisição:', errorMessage, err);
         setError(errorMessage);
-      } else if (err instanceof Error) { // Isso funciona para erros nativos do JS
+      } else if (err instanceof Error) { 
         console.error('Um erro inesperado ocorreu:', err.message);
         setError(err.message || 'Um erro inesperado ocorreu ao atualizar manutenção.');
       } else {

@@ -2,14 +2,13 @@ import { api } from './api';
 import type { Maintenance } from '../types'; 
 
 /**
- * Busca o resumo de manutenções (próximas e vencidas) para o dashboard.
- * GET /api/maintenances/summary
- * @returns {Promise<Maintenance[]>} Uma promessa que resolve com um array de objetos Maintenance.
+ * @description Fetches a summary of maintenance tasks (upcoming and overdue) for the dashboard.
+ * This corresponds to a GET request to `/api/maintenances/summary` on the backend.
+ * @returns {Promise<Maintenance[]>} A promise that resolves with an array of Maintenance objects.
  */
 export const getUpcomingMaintenances = async (): Promise<Maintenance[]> => {
   try {
     const response = await api.get<{ maintenances: Maintenance[] }>('/maintenances/summary');
-    // Confere com o backend: res.status(200).json({ maintenances: upcomingAndOverdue });
     return response.data.maintenances;
   } catch (error) {
     console.error("Error fetching upcoming maintenances:", error);
@@ -18,17 +17,16 @@ export const getUpcomingMaintenances = async (): Promise<Maintenance[]> => {
 };
 
 /**
- * Cria uma nova manutenção para um ativo.
+ * Creates a new asset maintenance
  * POST /api/maintenances
- * @param {Omit<Maintenance, 'id' | 'created_at' | 'updated_at' | 'asset_name' | 'asset_description'>} maintenanceData Os dados da nova manutenção.
- * @returns {Promise<Maintenance>} Uma promessa que resolve com o objeto da manutenção criada.
+ * @param {Omit<Maintenance, 'id' | 'created_at' | 'updated_at' | 'asset_name' | 'asset_description'>} maintenanceData 
+ * @returns {Promise<Maintenance>} 
  */
 export const createMaintenance = async (
   maintenanceData: Omit<Maintenance, 'id' | 'created_at' | 'updated_at' | 'asset_name' | 'asset_description'>
 ): Promise<Maintenance> => {
   try {
     const response = await api.post<{ maintenance: Maintenance }>('/maintenances', maintenanceData);
-    // Confere com o backend: res.status(201).json({ message: '...', maintenance: newMaintenance });
     return response.data.maintenance;
   } catch (error) {
     console.error("Error creating maintenance:", error);
@@ -37,15 +35,14 @@ export const createMaintenance = async (
 };
 
 /**
- * Obtém todas as manutenções para um ativo específico.
+ * Get all maintenance for a specific asset.
  * GET /api/maintenances/asset/:asset_id
- * @param {string} assetId O ID do ativo.
- * @returns {Promise<Maintenance[]>} Uma promessa que resolve com um array de objetos Maintenance.
+ * @param {string} assetId 
+ * @returns {Promise<Maintenance[]>} 
  */
 export const getAssetMaintenances = async (assetId: string): Promise<Maintenance[]> => {
   try {
     const response = await api.get<{ maintenances: Maintenance[] }>(`/maintenances/asset/${assetId}`);
-    // Confere com o backend: res.status(200).json({ maintenances });
     return response.data.maintenances;
   } catch (error) {
     console.error(`Error fetching maintenances for asset ${assetId}:`, error);
@@ -54,16 +51,15 @@ export const getAssetMaintenances = async (assetId: string): Promise<Maintenance
 };
 
 /**
- * Obtém os detalhes de uma manutenção específica.
+ * Get details from a specific asset maintenance.
  * GET /api/maintenances/asset/:asset_id/:id
- * @param {string} assetId O ID do ativo ao qual a manutenção pertence.
- * @param {string} maintenanceId O ID da manutenção.
- * @returns {Promise<Maintenance>} Uma promessa que resolve com o objeto Maintenance.
+ * @param {string} assetId
+ * @param {string} maintenanceId 
+ * @returns {Promise<Maintenance>} 
  */
 export const getMaintenanceById = async (assetId: string, maintenanceId: string): Promise<Maintenance> => {
   try {
     const response = await api.get<{ maintenance: Maintenance }>(`/maintenances/asset/${assetId}/${maintenanceId}`);
-    // Confere com o backend: res.status(200).json({ maintenance });
     return response.data.maintenance;
   } catch (error) {
     console.error(`Error fetching maintenance ${maintenanceId} for asset ${assetId}:`, error);
@@ -72,12 +68,12 @@ export const getMaintenanceById = async (assetId: string, maintenanceId: string)
 };
 
 /**
- * Atualiza uma manutenção existente.
+ * Update a maintenance
  * PUT /api/maintenances/asset/:asset_id/:id
- * @param {string} assetId O ID do ativo ao qual a manutenção pertence.
- * @param {string} maintenanceId O ID da manutenção a ser atualizada.
- * @param {Partial<Omit<Maintenance, 'id' | 'created_at' | 'updated_at' | 'asset_name' | 'asset_description'>>} updateData Os campos a serem atualizados.
- * @returns {Promise<Maintenance>} Uma promessa que resolve com o objeto da manutenção atualizada.
+ * @param {string} assetId 
+ * @param {string} maintenanceId 
+ * @param {Partial<Omit<Maintenance, 'id' | 'created_at' | 'updated_at' | 'asset_name' | 'asset_description'>>} updateData 
+ * @returns {Promise<Maintenance>} 
  */
 export const updateMaintenance = async (
   assetId: string,
@@ -86,7 +82,6 @@ export const updateMaintenance = async (
 ): Promise<Maintenance> => {
   try {
     const response = await api.put<Maintenance>(`/maintenances/asset/${assetId}/${maintenanceId}`, updateData);
-    // Confere com o backend: res.status(200).json(updatedMaintenance); -> Retorna o objeto direto
     return response.data;
   } catch (error) {
     console.error(`Error updating maintenance ${maintenanceId} for asset ${assetId}:`, error);
@@ -95,15 +90,14 @@ export const updateMaintenance = async (
 };
 
 /**
- * Exclui uma manutenção.
+ * Exclude a maintenance
  * DELETE /api/maintenances/asset/:asset_id/:id
- * @param {string} assetId O ID do ativo ao qual a manutenção pertence.
- * @param {string} maintenanceId O ID da manutenção a ser excluída.
- * @returns {Promise<void>} Uma promessa que resolve quando a exclusão é bem-sucedida.
+ * @param {string} assetId 
+ * @param {string} maintenanceId 
+ * @returns {Promise<void>}
  */
 export const deleteMaintenance = async (assetId: string, maintenanceId: string): Promise<void> => {
   try {
-    // Confere com o backend: res.status(204).send(); -> Não retorna corpo
     await api.delete(`/maintenances/asset/${assetId}/${maintenanceId}`);
   } catch (error) {
     console.error(`Error deleting maintenance ${maintenanceId} for asset ${assetId}:`, error);

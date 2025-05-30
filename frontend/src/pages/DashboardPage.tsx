@@ -121,7 +121,7 @@ function DashboardPage({ onLogout }: DashboardPageProps) {
       py: 4,
     }}>
       <Container maxWidth="xl">
-        {/* Cabeçalho da Página */}
+        {/* Header */}
         <Box sx={{
           display: 'flex',
           flexDirection: { xs: 'column', md: 'row' },
@@ -164,9 +164,9 @@ function DashboardPage({ onLogout }: DashboardPageProps) {
           </Stack>
         </Box>
 
-        {/* Seção Principal de Conteúdo - Usando Grid para layout */}
+        {/* Main Section */}
         <Grid container spacing={3}>
-          {/* Manutenções Próximas */}
+          {/* Next maintenances */}
           <Grid>
             <Paper elevation={3} sx={{ p: 3, height: '100%' }}>
               <Typography variant="h6" gutterBottom align="center" sx={{
@@ -179,9 +179,8 @@ function DashboardPage({ onLogout }: DashboardPageProps) {
             </Paper>
           </Grid>
 
-          {/* Lista de Ativos */}
+          {/* Asset List */}
           <Grid>
-            {/* CORREÇÃO AQUI: elevation deve ser um número */}
             <Paper elevation={3} sx={{ p: 3, height: '100%' }}>
               <Typography variant="h6" gutterBottom sx={{ color: theme.palette.primary.main, mb: 2 }}>
                 Meus Ativos

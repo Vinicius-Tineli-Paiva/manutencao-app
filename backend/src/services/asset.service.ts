@@ -78,7 +78,7 @@ export const updateAsset = async (asset_id: string, user_id: string, updates: Pa
   }
 
   if (setClauses.length === 0) {
-    return null; // No fields to update
+    return null; 
   }
 
   values.push(asset_id);

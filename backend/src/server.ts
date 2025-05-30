@@ -14,13 +14,6 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-/**
- * @description Root route to check if the server is running.
- */
-app.get('/', (req, res) => {
-  res.send('Asset Maintenance API is running!');
-});
-
 // Use authentication routes
 app.use('/api/auth', authRoutes); // All auth routes will be prefixed with /api/auth
 

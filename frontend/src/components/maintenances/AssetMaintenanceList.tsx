@@ -217,7 +217,6 @@ function AssetMaintenanceList({
                         >
                           <EditIcon />
                         </IconButton>
-                        {/* ICONE DA LIXEIRA AQUI PARA MANUTENÇÕES PENDENTES */}
                         <IconButton
                            aria-label="delete maintenance"
                            color="error"
@@ -301,7 +300,6 @@ function AssetMaintenanceList({
                       >
                         <EditIcon />
                       </IconButton>
-                      {/* ICONE DA LIXEIRA AQUI PARA MANUTENÇÕES CONCLUÍDAS */}
                       <IconButton
                         aria-label="delete maintenance"
                         color="error"

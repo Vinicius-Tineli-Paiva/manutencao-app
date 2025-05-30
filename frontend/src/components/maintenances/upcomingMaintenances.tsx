@@ -61,9 +61,9 @@ const UpcomingMaintenances: React.FC<UpcomingMaintenancesProps> = ({ refreshKey 
           {maintenances.map((maintenance) => {
             const nextDueDate = maintenance.next_due_date ? new Date(maintenance.next_due_date) : null;
             const today = new Date();
-            // Comparar apenas as datas, ignorando a hora
+            // Compare dates
             const isOverdue = nextDueDate && nextDueDate < today && nextDueDate.toDateString() !== today.toDateString();
-            const isDueSoon = nextDueDate && nextDueDate >= today && (nextDueDate.getTime() - today.getTime()) < (7 * 24 * 60 * 60 * 1000); // Próximos 7 dias
+            const isDueSoon = nextDueDate && nextDueDate >= today && (nextDueDate.getTime() - today.getTime()) < (7 * 24 * 60 * 60 * 1000); // Next 7 days
 
             return (
               <ListItem
@@ -71,7 +71,7 @@ const UpcomingMaintenances: React.FC<UpcomingMaintenancesProps> = ({ refreshKey 
                 sx={{
                   borderBottom: '1px solid #eee',
                   backgroundColor: isOverdue ? 'rgba(255, 0, 0, 0.1)' : (isDueSoon ? 'rgba(255, 255, 0, 0.1)' : 'inherit'),
-                  '&:last-child': { borderBottom: 'none' }, // Remove borda do último item
+                  '&:last-child': { borderBottom: 'none' },
                 }}
               >
                 <ListItemText

@@ -1,13 +1,10 @@
 -- Drop tables if they exist (for development/re-initialization)
--- CUIDADO: Se você já tem dados e NÃO quer perdê-los, COMENTE as linhas de DROP TABLE
 DROP TABLE IF EXISTS maintenances CASCADE;
-DROP TABLE IF EXISTS maintenance_schedules CASCADE; -- Se você não usa, pode remover esta tabela
+DROP TABLE IF EXISTS maintenance_schedules CASCADE; 
 DROP TABLE IF EXISTS assets CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 
 
--- Função auxiliar para atualizar o campo updated_at
--- (Você já tem essa função, apenas garantindo que esteja aqui para referência)
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -86,10 +83,3 @@ CREATE TRIGGER update_maintenances_updated_at
 BEFORE UPDATE ON maintenances
 FOR EACH ROW
 EXECUTE FUNCTION update_updated_at_column();
-
--- Se você precisar adicionar as colunas sem dropar a tabela (se já houver dados):
--- EXECUTE APENAS SE VOCÊ NÃO QUER DROPPER A TABELA MAINTENANCES:
--- ALTER TABLE maintenances ADD COLUMN is_completed BOOLEAN DEFAULT FALSE NOT NULL;
--- ALTER TABLE maintenances ALTER COLUMN completion_date DROP NOT NULL;
--- ATENÇÃO: Se a coluna completion_date já existir e tiver NOT NULL, e você tiver linhas com NULL nela,
--- a alteração "DROP NOT NULL" pode falhar. Garanta que não há NULLs ou defina um valor padrão temporário.
