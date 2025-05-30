@@ -1,7 +1,7 @@
+//Request/Response logic
 import { Request, Response } from 'express';
 import { createUser, findUserByIdentifier } from '../services/user.service';
 import { comparePassword, generateToken } from '../utils/auth.utils';
-import { User } from '../models/user.model';
 
 /**
  * @description Handles user registration.

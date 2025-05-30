@@ -1,3 +1,4 @@
+//Interaction with BD
 import { query } from '../config/db';
 import { User } from '../models/user.model';
 import { hashPassword } from '../utils/auth.utils';

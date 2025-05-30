@@ -1,3 +1,4 @@
+//Interaction with BD
 import { query } from '../config/db';
 import { Asset } from '../models/asset.model';
 

@@ -1,4 +1,3 @@
-// frontend/src/pages/AuthPage.tsx
 import React, { useState } from 'react';
 import { Box, Typography, Button, TextField, Paper, Tabs, Tab, CircularProgress, Alert } from '@mui/material';
 import { api } from '../api/api';

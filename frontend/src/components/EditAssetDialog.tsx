@@ -1,3 +1,4 @@
+//Modal to edit assets
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, CircularProgress, Alert } from '@mui/material';
 import { api } from '../api/api';
@@ -12,13 +13,11 @@ interface EditAssetDialogProps {
 }
 
 function EditAssetDialog({ open, onClose, assetToEdit, onAssetUpdated, onAssetAdded }: EditAssetDialogProps) {
-  // Inicializa os estados com os valores de assetToEdit se ele existir, senão vazio
   const [name, setName] = useState(assetToEdit?.name || '');
   const [description, setDescription] = useState(assetToEdit?.description || '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Atualizar os estados dos campos quando o 'assetToEdit' mudar (ou seja, quando o modal é aberto para um novo ativo)
   useEffect(() => {
     if (open) { 
       setName(assetToEdit?.name || '');

@@ -121,6 +121,7 @@ function AssetMaintenanceList({
     }
   };
 
+  //Separate the maintenances on pendings or completed
   const pendingMaintenances = maintenances.filter(m => !m.is_completed);
   const completedMaintenances = maintenances.filter(m => m.is_completed);
 
@@ -137,7 +138,7 @@ function AssetMaintenanceList({
         </Alert>
       ) : (
         <React.Fragment>
-          {/* SEÇÃO: Manutenções Pendentes */}
+          {/* Pendings Maintenances */}
           <Typography variant="h6" sx={{ mt: 3, mb: 1 }}>
             Manutenções Pendentes
             {pendingMaintenances.length === 0 && <Typography variant="body2" component="span" sx={{ ml: 1, color: 'text.secondary' }}>(Nenhuma pendente)</Typography>}

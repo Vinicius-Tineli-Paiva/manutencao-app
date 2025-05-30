@@ -1,3 +1,4 @@
+//Modals to create and add assetes
 import { useState, useEffect } from 'react';
 import { Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, Alert, CircularProgress } from '@mui/material';
 import { api } from '../api/api'; 
@@ -21,7 +22,6 @@ function AddAssetDialog({ open, onClose, onAssetAdded }: AddAssetDialogProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Reseta o formulário e erros quando o modal é aberto ou fechado
   useEffect(() => {
     if (open) {
       setName('');

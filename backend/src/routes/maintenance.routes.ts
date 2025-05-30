@@ -1,3 +1,6 @@
+//Define endpoints and routes are protected by middleware authenticateToken
+//getDashboardManintenanceSummary get passed or next maintenances
+
 import { Router } from 'express';
 import { createMaintenanceLog, getAssetMaintenanceLogs, getMaintenanceLog, updateMaintenanceLog, deleteMaintenanceLog, getDashboardMaintenanceSummary } from '../controllers/maintenance.controller';
 import { authenticateToken } from '../middlewares/auth.middleware';

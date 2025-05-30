@@ -1,6 +1,7 @@
+//Request/Response logic
 import { Request, Response } from 'express';
 import { createMaintenance, getMaintenanceLogsByAssetId, getMaintenanceByIdAndAssetId, updateMaintenance, deleteMaintenance, getUpcomingAndOverdueMaintenances } from '../services/maintenance.service';
-import { getAssetByIdAndUserId } from '../services/asset.service'; // Para verificar a posse do ativo
+import { getAssetByIdAndUserId } from '../services/asset.service';
 
 /**
  * @description Creates a new maintenance record for a specific asset.
@@ -188,8 +189,8 @@ export const getDashboardMaintenanceSummary = async (req: Request, res: Response
   }
 
   try {
-    // Passamos o user_id e a quantidade de dias para buscar as manutenções futuras e vencidas
-    const upcomingAndOverdue = await getUpcomingAndOverdueMaintenances(userId, 7); // Busca para os próximos 7 dias
+    // Give user_id and the quantity of days to search for passed or next maintenances
+    const upcomingAndOverdue = await getUpcomingAndOverdueMaintenances(userId, 7); // Next 7 days
     res.status(200).json({ maintenances: upcomingAndOverdue });
   } catch (error) {
     console.error('Error in getDashboardMaintenanceSummary:', error);

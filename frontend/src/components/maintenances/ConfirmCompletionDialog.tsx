@@ -1,3 +1,4 @@
+//Modal to confirm the conclusion of a maintenance
 import React, { useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Stack, Typography, Alert, CircularProgress } from '@mui/material';
 import { format, isFuture, parseISO } from 'date-fns'; 
